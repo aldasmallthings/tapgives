@@ -30,6 +30,22 @@ services:
       - SECRET=${SECRET}
     depends_on:
       - db
+
+  subscription_service:
+    build: ./subs
+    command: uvicorn app.main:app --reload --host 0.0.0.0 --port 80
+    volumes:
+      - ./subs/:/app/
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_SERVER=db
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - SECRET=${SECRET}
+    depends_on:
+      - db
+
   db:
     image: postgres:alpine
     volumes:
@@ -51,6 +67,7 @@ services:
     depends_on:
       - user_service
       - project_service
+      - subscription_service
 
 volumes:
   data:
