@@ -1,6 +1,4 @@
-# [WEMAKEIMPACT(https://github.com/aldasmallthings/.1)
-###### WEMAKE IMPACT non profit organisation
-
+###### WEMAKE IMPACT
 
 ### Technology Stack
 * [FastAPI](https://fastapi.tiangolo.com/), 
@@ -20,19 +18,30 @@
             ├── __init__.py
             ├── config.py
             ├── main.py
-    ├── project-service
+    ├── projects-service
         ├── Dockerfile
         ├── Pipfile
         ├── Pipfile.lock
         ├── app
-            ├── user-service
-            ├── Dockerfile
-            ├── Pipfile
-            ├── Pipfile.lock
-            ├── api
+             ├── main.py
+             ├── config.py
+             ├── api
                 ├── __init__.py
                 ├── db.py
                 ├── processes.py
+                ├── projects.py
+                ├── schema.py
+    ├── subscription-servise
+        ├── Dockerfile
+        ├── Pipfile
+        ├── Pipfile.lock
+        ├── app
+            ├── main.py
+            ├── config.py
+            ├── api
+                ├── __init__.py
+                ├── db.py
+                ├── manage.py
                 ├── projects.py
                 ├── schema.py
     ├── .dockerignore
