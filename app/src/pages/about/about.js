@@ -1,4 +1,15 @@
-/* eslint-disable react/react-in-jsx-scope */
-let About =()=><h2>About Us</h2>;
+import React from 'react'
+import Navbar from '../../components/navbar/nav';
+import Profile from '../../components/profile/profile'
+
+
+let About =()=>{
+    return (
+    <>
+    <Navbar component={Profile} />
+        <h2>About page</h2>
+    </>
+    );
+}
 
 export default About;

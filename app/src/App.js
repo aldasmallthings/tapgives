@@ -5,6 +5,7 @@ import Login from './pages/auth/login'
 import Home from './pages/home/home'
 import About from './pages/about/about'
 import Contacts from './pages/contacts/contacts'
+import Subscribe from './pages/auth/subscribe'
 import {
   BrowserRouter as Router,
   Switch,
@@ -21,6 +22,7 @@ function App() {
               <Route exact path="/" component={Home} /> 
               <Route path="/about" component={About} />
               <Route path="/contacts" component={Contacts} />
+              <Route path="/subscribe" component={Subscribe} />
             </Switch>
     </Router>
   );

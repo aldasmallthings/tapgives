@@ -53,7 +53,7 @@ export default class Register extends Component{
     render(){
     return(
         <>
-        <Navbar button = {Button}/>
+        <Navbar component = {Button}/>
         <div className='login'>
             <div className="welcome">
                 <div className="gradient-text-top">welcome to tapgives.</div>

@@ -8,7 +8,8 @@ export default class Login extends Component {
     render() {
         return(
             <div>
-                <Navbar button={Button} />
+                <Navbar component={Button} />
+                <h2>Log in page comes here! </h2>
             </div>
         )
     }

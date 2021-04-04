@@ -52,7 +52,7 @@ function Navbar(props) {
           </li>
         </ul>
         <div>
-          <props.button /> 
+          <props.component /> 
         </div>
       </nav>
     </>
