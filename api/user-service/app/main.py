@@ -31,23 +31,37 @@ class User(models.BaseUser):
     is_staff: Optional[bool] = False
     first_name: str
     last_name: str
+    phone: str
+    usertype: str
 
 
 class UserCreate(models.BaseUserCreate):
     is_staff: Optional[bool] = False
+    is_superuser: Optional[bool] = False
+    is_active :Optional[bool] = True
+    is_verified: Optional[bool]=True
     first_name: str
     last_name: str
+    phone: str
+    usertype: str
 
 
 class UserUpdate(User, models.BaseUserUpdate):
     first_name: Optional[str]
     last_name: Optional[str]
+    phone: Optional[str]
+    usertype: Optional[str]
+    is_staff: Optional[bool]
+    is_active: Optional[bool]
+    is_superuser: Optional[bool]
 
 
 class UserDB(User, models.BaseUserDB):
     is_staff: bool
     first_name: str
     last_name: str
+    phone: str
+    usertype: str
 
 
 database = databases.Database(DATABASE_URL)
@@ -55,11 +69,11 @@ Base: DeclarativeMeta = declarative_base()
 
 
 class UserTable(Base, SQLAlchemyBaseUserTable):
-    is_staff = Column(Boolean, default=False, nullable=False)
     first_name = Column(String(length=50), index=True, nullable=False)
     last_name = Column(String(length=50), index=True, nullable=False)
     phone = Column(String(length=50), nullable=False)
-    usertype = Column(Integer)
+    usertype = Column(String,nullable=False)
+    is_staff= Column(Boolean ,nullable=False)
 
     @classmethod
     def get_full_name(cls):
@@ -96,8 +110,13 @@ app = FastAPI(
     title="wemakeimpact Auth API",
     docs_url=f"{settings.API_V1_STR}/auth/docs",
 )
+origins = [
+    "http://localhost:3000",
+]
 app.add_middleware(
     CORSMiddleware,
+    allow_origins = origins,
+    allow_credentials = True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
