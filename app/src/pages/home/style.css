@@ -39,8 +39,10 @@
     padding:2px;
     display: flex;
 }
-.icon{
+.icon i{
     color:#706D6D ;
+}
+.icon{
     font-size: 300%;
     margin-top: 10%;
     margin-right: 5%;
