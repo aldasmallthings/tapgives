@@ -22,6 +22,7 @@ function Navbar(props) {
               <i className="fab fa-facebook-square"></i>
               <i className="fab fa-instagram"></i>
               <i className="fab fa-tiktok"></i>
+              
             </li>     
           <li className='nav-item'>
             <Link
@@ -41,7 +42,7 @@ function Navbar(props) {
               contacts
             </Link>
           </li>
-          <li>
+          {/* <li>
             <Link
               to='/login'
               className='nav-links-mobile'
@@ -49,11 +50,11 @@ function Navbar(props) {
             >
               login
             </Link>
-          </li>
-        </ul>
-        <div>
-          <props.component /> 
-        </div>
+          </li> */}
+        <li>
+          <props.component className = "extention"/> 
+        </li>
+      </ul>
       </nav>
     </>
   );

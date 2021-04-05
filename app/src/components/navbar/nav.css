@@ -75,13 +75,20 @@
   .menu-icon {
     display: none;
   }
-  
+
   @media screen and (max-width: 960px) {
     .NavbarItems {
       position: relative;
     }
     .social-icons{
-      display:none;
+      margin-left: 30%;
+      width: 30%;
+      display: inline-flex;
+      justify-content: space-around;
+    }
+    .social-icons i{
+      padding:5px 20px;
+      color:#6A4441;
     }
     .nav-menu {
       display: flex;

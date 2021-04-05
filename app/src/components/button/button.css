@@ -12,6 +12,7 @@
     color: #6A4441;
     cursor: pointer;
     background-color: var(--primary);
+    margin-top: 25%;
   }
 
 
@@ -27,8 +28,8 @@
   .btn:hover {
     padding: 6px 18px;
     transition: all 0.3s ease-out;
-    background-color: #F3E2E2;
-    color: #6A4441;
+    background-color:  #6A4441;
+    color: #F3E2E2;
     border-radius: 4px;
     border: 2px solid var(--primary);
     transition: all 0.3s ease-out;
@@ -36,7 +37,7 @@
   
 @media screen and (max-width:960px){
   .btn{
-    display: none;
+    margin-top: 5%;
   }
 
 }

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios'
-import './login.css'
+import './register.css'
 import Navbar from '../../components/navbar/nav'
 import Button  from '../../components/button/loginbtn';
 import Togglebtn from '../../components/button/togglebnt'
@@ -54,7 +54,7 @@ export default class Register extends Component{
     return(
         <>
         <Navbar component = {Button}/>
-        <div className='login'>
+        <div className='register'>
             <div className="welcome">
                 <div className="gradient-text-top">welcome to tapgives.</div>
                 <div className="gradient-text">a place to empower</div>
@@ -63,9 +63,9 @@ export default class Register extends Component{
             <div className = "language">
                 change your language <Togglebtn />
             </div>
-            <div className="login-form">
-                <div className="formtext">Join the global community and access local resources.</div>
-                <div className="formtext">Get started with your account today.</div>
+            <div className="register-form">
+                <div className="formtext">Join the global community and access local resources.<br />
+                Get started with your account today.</div>
                 <form className="form-group" onSubmit={this.handleSubmit}>
                         <div className="row">
                             <div className="form-col">

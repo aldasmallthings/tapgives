@@ -45,15 +45,53 @@
 .icon{
     font-size: 300%;
     margin-top: 10%;
-    margin-right: 5%;
+    margin-right: 10%;
 }
 
 .detail{
     font-family: 'Heebo', sans-serif;
+    width: 90%;
 }
 .detail h5{
     font-size: 110%;
 }
 .detail h6{
     font-size: 100%;
+}
+
+@media screen and (max-width:960px) {
+    .banner{
+        font-size: 120%;
+        color: linear-gradient(90deg,rgba(106,68,65,1)  0%, rgba(121,9,26,1) 100%,  rgba(187,127,126,1) 100%);
+        background-color: #C18383;
+        background-image: linear-gradient(90deg,rgba(106,68,65,1)  20%, rgba(187,127,126,1) 50%, rgba(187,127,126,1) 58%);
+        background-size: 100%;
+        -webkit-background-clip: text;
+        -moz-background-clip: text;
+        -webkit-text-fill-color: transparent; 
+        -moz-text-fill-color: transparent;
+    }
+    .content-header{
+        font-size: 120%;
+        font-weight: bolder;
+        color: #8A5B59;
+        font-family: 'Heebo', sans-serif;   
+    }
+
+    .content-row{
+        display:block;
+        width: 100%;
+    }
+    .content-col{
+        width: 100%;
+    }
+    .detail{
+        width: 100%;
+    }
+    .detail h5{
+        font-size: 95%;
+    }
+    .detail h6{
+        font-size: 80%;
+    }
 }
