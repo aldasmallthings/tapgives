@@ -1,14 +1,14 @@
 import React from 'react'
 import Navbar from '../../components/navbar/nav';
-import Profile from '../../components/profile/profile'
+import UserProfile from '../../components/profile/profile'
 import './style.css'
 
 
 let Home =()=>{
     return (
     <>
+    <Navbar component={UserProfile} />
     <div className="homepage">
-        <Navbar component={Profile} />
         <div className="banner">
             thankyou for joining the tapgive community
         </div>

@@ -6,13 +6,13 @@
 
 .register{
     font-size: 200%;
-    margin-left: 10%;
+    width:78%;
+    margin-left: 11%;
     font-weight: bolder;
     font-family: 'Heebo', sans-serif;
-    color: linear-gradient(90deg, rgba(187,127,126,1) 0%, rgba(121,9,26,1) 100%, rgba(106,68,65,1) 100%);
-
 }
 .welcome{
+    width: 90%;
     font-weight: 1000;
     padding: 0px 20px;
     margin-bottom: 2rem;
@@ -28,8 +28,10 @@
 }
 .gradient-text-top {
     background-color: #C18383;
-    background-image: linear-gradient(90deg, rgba(187,127,126,1) 0%, rgba(187,127,126,1) 36%, rgba(106,68,65,1) 58%);
-    background-size: 40%;
+    font-size: 180%;
+    background-image: linear-gradient(90deg, rgba(187,127,126,1) 10%, rgba(187,127,126,1) 20%, rgba(106,68,65,1) 60%);
+    background-size: 100%;
+    background-clip: text;
     -webkit-background-clip: text;
     -moz-background-clip: text;
     -webkit-text-fill-color: transparent; 
@@ -37,8 +39,10 @@
 }
 .gradient-text {
     background-color: #F3E2E2;
-    background-image: linear-gradient(90deg, rgba(187,127,126,1) 0%, rgba(187,127,126,1) 7%, rgba(106,68,65,1) 100%);
-    background-size: 40%;
+    font-size: 180%;
+    background-image: linear-gradient(90deg, rgba(187,127,126,1) 15%, rgba(187,127,126,1) 7%, rgba(106,68,65,1) 100%);
+    background-size: 100%;
+    background-clip: text;
     -webkit-background-clip: text;
     -moz-background-clip: text;
     -webkit-text-fill-color: transparent; 
@@ -94,34 +98,16 @@
     color: red;
     font-size: 50%;
 }
-@media screen and (max-width: 960px) {
+@media screen and (max-width: 960px) and (min-width: 661px){
     .welcome{
-        font-size: 60%;
-    }
-    .gradient-text-top {
-        background-color: #C18383;
-        background-image: linear-gradient(90deg, rgba(187,127,126,1) 0%, rgba(187,127,126,1) 36%, rgba(106,68,65,1) 58%);
-        background-size: 90%;
-        -webkit-background-clip: text;
-        -moz-background-clip: text;
-        -webkit-text-fill-color: transparent; 
-        -moz-text-fill-color: transparent;
-    }
-    .gradient-text {
-        background-color: #F3E2E2;
-        background-image: linear-gradient(90deg, rgba(187,127,126,1) 0%, rgba(187,127,126,1) 7%, rgba(106,68,65,1) 100%);
-        background-size: 90%;
-        -webkit-background-clip: text;
-        -moz-background-clip: text;
-        -webkit-text-fill-color: transparent; 
-        -moz-text-fill-color: transparent;
-    }
+        font-size: 70%;
+    }   
     .form-group{
         margin-top: 10%;
     }
     .row{
         display:inline-block;
-        width: 90%;
+        width: 100%;
     }
     .form-col input{
         border: 1.5px solid #292424;
@@ -134,16 +120,32 @@
         font-size: 45%;
         margin-top: 5%;
     }
-    .submit{
-        padding: 8px 20px;
-        margin-top: 5%;
-        padding: 8px 20px;
-        border-radius: 50px;
-        font-size: 18px;
-        color: #F5E6E6;
-        background-color: #CE8D8D;
-        cursor: pointer;
-        border: 1px solid transparent;
+    #error{
+        color: red;
+        font-size: 30%;
+    }
+}
+
+@media screen and (max-width: 660px) {
+    .welcome{
+        font-size: 50%;
+    }
+    .form-group{
+        margin-top:5%;
+    }
+    .row{
+        display:inline-block;
+        width: 100%;
+    }
+    .form-col input{
+        border: 1.5px solid #292424;
+        border-radius: 5px;
+        width: 80%;
+    }
+    .formtext{
+        font-weight: bolder;
+        font-size: 40%;
+        margin-top: 2%;
     }
     #error{
         color: red;

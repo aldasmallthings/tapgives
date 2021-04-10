@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import './style.css'
 
 
-let Profile=()=>{
+let UserProfile=()=>{
 return (
     <div className='profile'>
         <Link to="/sign-up">
@@ -12,4 +12,4 @@ return (
     </div> 
 );
 }
-export default Profile;
+export default UserProfile;

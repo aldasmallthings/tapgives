@@ -3,17 +3,19 @@
     --toggle: #6A4441;
 }
 .homepage{
-    width:90%;
+    width:78%;
+    margin-left: 11%;
 }
 .banner{
+    padding-top: 5%;
     font-size: 200%;
-    margin-left: 11%;
     font-weight: bolder;
     font-family: 'Heebo', sans-serif;
-    color: linear-gradient(90deg,rgba(106,68,65,1)  0%, rgba(121,9,26,1) 100%,  rgba(187,127,126,1) 100%);
+    color: linear-gradient(90deg,rgba(106,68,65,1)  50%, rgba(121,9,26,1) 80%,  rgba(187,127,126,1) 100%);
     background-color: #C18383;
-    background-image: linear-gradient(90deg,rgba(106,68,65,1)  20%, rgba(187,127,126,1) 50%, rgba(187,127,126,1) 58%);
-    background-size: 80%;
+    background-image: linear-gradient(90deg,rgba(106,68,65,1)  50%, rgba(187,127,126,1) 70%, rgba(187,127,126,1) 100%);
+    background-size: 100%;
+    background-clip: text;
     -webkit-background-clip: text;
     -moz-background-clip: text;
     -webkit-text-fill-color: transparent; 
@@ -22,7 +24,6 @@
 .content{
     width: 90%;
     margin-top: 5%;
-    margin-left: 6%;
 }
 .content-header{
     font-size: 130%;
@@ -62,10 +63,12 @@
 @media screen and (max-width:960px) {
     .banner{
         font-size: 120%;
-        color: linear-gradient(90deg,rgba(106,68,65,1)  0%, rgba(121,9,26,1) 100%,  rgba(187,127,126,1) 100%);
+        padding-top: 5%;
+        color: linear-gradient(90deg,rgba(106,68,65,1)  50%, rgba(121,9,26,1) 80%,  rgba(187,127,126,1) 100%);
         background-color: #C18383;
-        background-image: linear-gradient(90deg,rgba(106,68,65,1)  20%, rgba(187,127,126,1) 50%, rgba(187,127,126,1) 58%);
+        background-image: linear-gradient(90deg,rgba(106,68,65,1)  50%, rgba(187,127,126,1) 70%, rgba(187,127,126,1) 200%);
         background-size: 100%;
+        background-clip: text;
         -webkit-background-clip: text;
         -moz-background-clip: text;
         -webkit-text-fill-color: transparent; 

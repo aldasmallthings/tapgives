@@ -14,9 +14,19 @@
     background-color: var(--primary);
     margin-top: 25%;
   }
-
+  .formbtn{
+    margin-top: 5%;
+    padding: 8px 20px;
+    border-radius: 50px;
+    font-size: 150%;
+    color: #F5E6E6;
+    background-color: #CE8D8D;
+    cursor: pointer;
+    border: 1px solid transparent;
+  }
 
   .togglebtn{
+    margin: 5px 5px;
     padding: 6px 18px;
     transition: all 0.3s ease-out;
     background-color: #6A4441;
@@ -39,5 +49,8 @@
   .btn{
     margin-top: 5%;
   }
-
+  .formbtn{
+    font-size: 70%;
+    padding: 8px 20px;
+  }
 }

@@ -1,10 +1,10 @@
 import React from 'react';
 import './button.css';
 
-function Formbtn() {
+function Formbtn(props) {
 return (
-    <button className='togglebtn'>
-        swahili 
+    <button className='formbtn'>
+        {props.name}
     </button>
 );
 }

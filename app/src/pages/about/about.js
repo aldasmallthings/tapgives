@@ -1,13 +1,16 @@
 import React from 'react'
 import Navbar from '../../components/navbar/nav';
-import Profile from '../../components/profile/profile'
+import UserProfile from '../../components/profile/profile'
+import './style.css'
 
 
 let About =()=>{
     return (
     <>
-    <Navbar component={Profile} />
-        <h2>About page</h2>
+        <Navbar component={UserProfile} />
+        <div className="about-page">
+            <h2>About page under construction!</h2>
+        </div>
     </>
     );
 }

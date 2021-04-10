@@ -4,6 +4,7 @@ import './register.css'
 import Navbar from '../../components/navbar/nav'
 import Button  from '../../components/button/loginbtn';
 import Togglebtn from '../../components/button/togglebnt'
+import Formbtn from './../../components/button/formbtn'
 
 export default class Register extends Component{
     constructor(props){
@@ -65,101 +66,99 @@ export default class Register extends Component{
             </div>
             <div className="register-form">
                 <div className="formtext">Join the global community and access local resources.<br />
-                Get started with your account today.</div>
-                <form className="form-group" onSubmit={this.handleSubmit}>
-                        <div className="row">
+                    Get started with your account today.</div>
+                    <form className="form-group" onSubmit={this.handleSubmit}>
+                            <div className="row">
+                                <div className="form-col">
+                                    <div>
+                                        <i className="fas fa-address-card"></i>
+                                        <label>
+                                            first name
+                                        </label> 
+                                    </div>   
+                                    <div>
+                                        <input type="text" name="fname" placeholder="john" required
+                                        onChange={e => this.firstName = e.target.value}
+                                        />
+                                    </div>             
+                                </div>
+                                <div className="form-col">
+                                    <div>
+                                        <i className="fas fa-address-card"></i>
+                                        <label>
+                                            last name
+                                        </label> 
+                                    </div>   
+                                    <div>
+                                        <input type="text" name="lname" placeholder="doe" required
+                                        onChange={e => this.lastName = e.target.value}
+                                        />
+                                    </div> 
+                                </div>
+                            </div>  
+                            <div className="row">
+                                <div className="form-col">
+                                    <div>
+                                        <i className="fas fa-envelope"></i>
+                                        <label>
+                                            email (optional)
+                                        </label> 
+                                    </div>   
+                                    <div>
+                                        <input type="email" name="fname" placeholder="john@mail.com"
+                                        onChange={e => this.email = e.target.value}
+                                        />
+                                    </div>             
+                                </div>
+                                <div className="form-col">
+                                    <div>
+                                        <i className="fas fa-phone-alt"></i>
+                                        <label>
+                                            phone number
+                                        </label> 
+                                    </div>   
+                                    <div>
+                                        <input type="text" name="lname" placeholder="ex: 07XX XXX XXX" required
+                                        onChange={e => this.phone = e.target.value}
+                                        />
+                                    </div> 
+                                </div>
+                            </div>  
+                            <div className="row">
                             <div className="form-col">
-                                <div>
-                                    <i className="fas fa-address-card"></i>
-                                    <label>
-                                        first name
-                                    </label> 
-                                </div>   
-                                <div>
-                                    <input type="text" name="fname" placeholder="john" required
-                                    onChange={e => this.firstName = e.target.value}
-                                    />
-                                </div>             
-                            </div>
-                            <div className="form-col">
-                                <div>
-                                    <i className="fas fa-address-card"></i>
-                                    <label>
-                                        last name
-                                    </label> 
-                                </div>   
-                                <div>
-                                    <input type="text" name="lname" placeholder="Doe" required
-                                    onChange={e => this.lastName = e.target.value}
-                                    />
-                                </div> 
-                            </div>
-                        </div>  
-                        <div className="row">
-                            <div className="form-col">
-                                <div>
-                                    <i className="fas fa-envelope"></i>
-                                    <label>
-                                        email (optional)
-                                    </label> 
-                                </div>   
-                                <div>
-                                    <input type="email" name="fname" placeholder="john@mail.com"
-                                    onChange={e => this.email = e.target.value}
-                                    />
-                                </div>             
-                            </div>
-                            <div className="form-col">
-                                <div>
-                                    <i className="fas fa-phone-alt"></i>
-                                    <label>
-                                        phone number
-                                    </label> 
-                                </div>   
-                                <div>
-                                    <input type="text" name="lname" placeholder="ex: 07XX XXX XXX" required
-                                    onChange={e => this.phone = e.target.value}
-                                    />
-                                </div> 
-                            </div>
-                        </div>  
-                        <div className="row">
-                        <div className="form-col">
-                                <div>
-                                    <i className="fas fa-lock"></i>
-                                    <label>
-                                        password
-                                    </label> 
-                                </div>   
-                                <div>
-                                    <input type="password" name="lname" placeholder="******" required
-                                    onChange={e => this.password = e.target.value}
-                                    />
-                                </div> 
-                            </div>
-                            <div className="form-col">
-                                <div>
-                                    <i className="fas fa-lock"></i>
-                                    <label>
-                                        retype password
-                                    </label>                                     
-                                </div>   
-                                <div>
-                                    <input type="password" name="lname" placeholder="retype password" required
-                                    onChange={e=>this.validatePassword(e.target.value)}
-                                    />
-                                </div> 
-                                <label id="error" style={this.errorstyles().style}>
-                                        PASSWORDS DO NOT MATCH!
-                                    </label>
-                            </div>
-                        </div> 
-                        <div className="row">
-                            <button className="submit">
-                                create account
-                            </button>
-                        </div>                 
-                </form>
+                                    <div>
+                                        <i className="fas fa-lock"></i>
+                                        <label>
+                                            password
+                                        </label> 
+                                    </div>   
+                                    <div>
+                                        <input type="password" name="lname" placeholder="******" required
+                                        onChange={e => this.password = e.target.value}
+                                        />
+                                    </div> 
+                                </div>
+                                <div className="form-col">
+                                    <div>
+                                        <i className="fas fa-lock"></i>
+                                        <label>
+                                            retype password
+                                        </label>                                     
+                                    </div>   
+                                    <div>
+                                        <input type="password" name="lname" placeholder="retype password" required
+                                        onChange={e=>this.validatePassword(e.target.value)}
+                                        />
+                                    </div> 
+                                    <label id="error" style={this.errorstyles().style}>
+                                            PASSWORDS DO NOT MATCH!
+                                        </label>
+                                </div>
+                            </div> 
+                            <div className="row">
+                                <Formbtn name="create account" />
+                            </div>                 
+                    </form>
             </div>
         </div>
         </>
