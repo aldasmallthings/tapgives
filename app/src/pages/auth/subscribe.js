@@ -2,7 +2,7 @@ import React from 'react';
 import Navbar from '../../components/navbar/nav';
 import UserProfile from '../../components/profile/profile'
 import Formbtn from './../../components/button/formbtn'
-import './subscribe.css'
+import './static/subscribe.css'
 
 function Subscribe() {
   return (

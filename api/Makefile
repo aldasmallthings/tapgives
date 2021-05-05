@@ -1,6 +1,6 @@
 verbosity=15
 language='en-gb'
-compose:=docker-compose
+compose:=docker-compose -f stack.yml
 
 help:
 	@echo "Usage:"
@@ -12,7 +12,7 @@ env:
 	cp .env.example .env
 
 buildstack:
-	$(compose) build 
+	$(compose) build
 
 downstack:
 	$(compose) down
@@ -27,3 +27,5 @@ stack: propagatestack
 
 tearstack:
 	$(compose) down -v --rmi local --remove-orphans
+
+

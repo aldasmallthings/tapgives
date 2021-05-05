@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios'
 import './style.css'
-import { Link } from 'react-router-dom'
+// import { Link } from 'react-router-dom'
 import Navbar from '../../components/navbar/nav'
 import UserProfile  from '../../components/profile/profile';
 import Formbtn from './../../components/button/formbtn'

@@ -1,0 +1,37 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+flake8 = "*"
+autoflake = "*"
+black = "==20.8b0"
+isort = "==5.7.0"
+mypy = "*"
+coverage = "*"
+pytest = "*"
+pytest-cov = "*"
+pytest-html = "*"
+sqlalchemy-stubs = "*"
+
+[packages]
+alembic = "*"
+asyncpg = "*"
+celery = {extras = ["redis"],version = "*"}
+databases = {extras = ["postgresql"],version = "*"}
+emails = "*"
+fastapi = "*"
+fastapi-pagination = "*"
+passlib = {extras = ["bcrypt"],version = "*"}
+psycopg2-binary = "*"
+python-jose = {extras = ["cryptography"],version = "*"}
+sqlalchemy = "*"
+uvicorn = "*"
+python-multipart = "*"
+raven = "*"
+tenacity = "*"
+pydantic = {extras = ["email"],version = "*"}
+
+[requires]
+python_version = "3.7"

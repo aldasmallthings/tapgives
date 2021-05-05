@@ -1,57 +1,19 @@
-import React, { Component } from 'react';
-import axios from 'axios'
-import './register.css'
-import Navbar from '../../components/navbar/nav'
+import './static/register.css';
+import Navbar from '../../components/navbar/nav';
 import Button  from '../../components/button/loginbtn';
-import Togglebtn from '../../components/button/togglebnt'
-import Formbtn from './../../components/button/formbtn'
+import Togglebtn from '../../components/button/togglebnt';
+import Formbtn from './../../components/button/formbtn';
+import  useForm  from '../../utils/hooks/useForm'
+import { validateRegistrationInput as validate }from '../../utils/validateInput'
+ 
 
-export default class Register extends Component{
-    constructor(props){
-        super(props);
-        this.state = {display: 'none'};
-        this.errorstyle = this.errorstyles.bind(this);
-        this.defaultUser = 'subscriber'        
-    }
-
-    errorstyles =()=> {
-        return({
-            style : {
-            display:this.state.display
-            }
-        })
-    }
+let Register = ({submitForm}) =>{   
+        const {handleChange,values,handleSubmit,errors} = useForm(submitForm,validate);
+        let errorStyles = {
+            color: 'red',
+            fontSize: '90%'
+        }  
     
-    handleSubmit = e =>{
-        e.preventDefault();
-        let headers = new Headers();
-
-        headers.append('Content-Type', 'application/json');
-        headers.append('Accept', 'application/json');
-        headers.append('Origin','http://localhost:3000');
-        let data = {
-            first_name: this.firstName,
-            last_name: this.lastName,
-            email: this.email,
-            phone: this.phone,
-            password: this.password,
-            usertype: this.defaultUser,
-        }
-        axios.post('http://127.0.0.1:4000/api​/v1​/auth​/register',data,{headers:{headers}})
-            .then(response=>console.log(response))
-            .catch(err=>console.log(err))
-    }
-    
-    validatePassword = val =>{
-        let retyped_pass = val;
-        if (retyped_pass === this.password) {
-            this.setState({display:'none'})
-        } else{
-            this.setState({display:''})
-        }
-    }
-    
-    render(){
     return(
         <>
         <Navbar component = {Button}/>
@@ -67,31 +29,43 @@ export default class Register extends Component{
             <div className="register-form">
                 <div className="formtext">Join the global community and access local resources.<br />
                     Get started with your account today.</div>
-                    <form className="form-group" onSubmit={this.handleSubmit}>
+                    <form className="form-group" onSubmit={handleSubmit}>
                             <div className="row">
                                 <div className="form-col">
                                     <div>
                                         <i className="fas fa-address-card"></i>
-                                        <label>
+                                        <label htmlFor="firstName">
                                             first name
                                         </label> 
                                     </div>   
                                     <div>
-                                        <input type="text" name="fname" placeholder="john" required
-                                        onChange={e => this.firstName = e.target.value}
+                                        <input 
+                                        id="firstName" 
+                                        type="text"
+                                        name="firstName" 
+                                        placeholder="john"    
+                                        onChange={handleChange} 
+                                        value = {values.firstName}
+                                        required                                   
                                         />
                                     </div>             
                                 </div>
                                 <div className="form-col">
                                     <div>
                                         <i className="fas fa-address-card"></i>
-                                        <label>
+                                        <label htmlFor="lname">
                                             last name
                                         </label> 
                                     </div>   
                                     <div>
-                                        <input type="text" name="lname" placeholder="doe" required
-                                        onChange={e => this.lastName = e.target.value}
+                                        <input 
+                                        id="lastName"
+                                        type="text" 
+                                        name="lastName" 
+                                        placeholder="doe"    
+                                        onChange={handleChange}  
+                                        value = {values.lastName}
+                                        required
                                         />
                                     </div> 
                                 </div>
@@ -100,26 +74,37 @@ export default class Register extends Component{
                                 <div className="form-col">
                                     <div>
                                         <i className="fas fa-envelope"></i>
-                                        <label>
+                                        <label htmlFor="email">
                                             email (optional)
                                         </label> 
                                     </div>   
                                     <div>
-                                        <input type="email" name="fname" placeholder="john@mail.com"
-                                        onChange={e => this.email = e.target.value}
+                                        <input 
+                                        id="email"
+                                        type="email"
+                                        name="email" 
+                                        placeholder="john@mail.com"  
+                                        onChange={handleChange}
+                                        value = {values.email}  
                                         />
                                     </div>             
                                 </div>
                                 <div className="form-col">
                                     <div>
                                         <i className="fas fa-phone-alt"></i>
-                                        <label>
+                                        <label htmlFor="phone">
                                             phone number
                                         </label> 
                                     </div>   
                                     <div>
-                                        <input type="text" name="lname" placeholder="ex: 07XX XXX XXX" required
-                                        onChange={e => this.phone = e.target.value}
+                                        <input 
+                                        id="phone"
+                                        type="text" 
+                                        name="phone" 
+                                        placeholder="ex: 07XX XXX XXX"
+                                        onChange={handleChange}  
+                                        value = {values.phone}
+                                        required
                                         />
                                     </div> 
                                 </div>
@@ -128,30 +113,46 @@ export default class Register extends Component{
                             <div className="form-col">
                                     <div>
                                         <i className="fas fa-lock"></i>
-                                        <label>
+                                        <label htmlFor="password">
                                             password
                                         </label> 
                                     </div>   
                                     <div>
-                                        <input type="password" name="lname" placeholder="******" required
-                                        onChange={e => this.password = e.target.value}
+                                        <input
+                                        id="password"
+                                        type="password" 
+                                        name="password" 
+                                        placeholder="******" 
+                                        required   
+                                        onChange={handleChange}  
+                                        value = {values.password}
                                         />
-                                    </div> 
+                                    </div>
+                                    <label id="error" 
+                                        style={errorStyles}>
+                                        {errors.password}
+                                        </label> 
                                 </div>
                                 <div className="form-col">
                                     <div>
                                         <i className="fas fa-lock"></i>
-                                        <label>
+                                        <label htmlFor="retypepass">
                                             retype password
                                         </label>                                     
                                     </div>   
                                     <div>
-                                        <input type="password" name="lname" placeholder="retype password" required
-                                        onChange={e=>this.validatePassword(e.target.value)}
+                                        <input
+                                        id="retypepass"
+                                        type="password" 
+                                        name="password2" 
+                                        placeholder="retype password" 
+                                        required   
+                                        onChange={handleChange}  
+                                        value = {values.password2 }
                                         />
                                     </div> 
-                                    <label id="error" style={this.errorstyles().style}>
-                                            PASSWORDS DO NOT MATCH!
+                                    <label id="error" style={errorStyles}>
+                                            {errors.password2}
                                         </label>
                                 </div>
                             </div> 
@@ -159,8 +160,11 @@ export default class Register extends Component{
                                 <Formbtn name="create account" />
                             </div>                 
                     </form>
+                    <span>Already have an account? <a href="/login">login</a></span>
             </div>
         </div>
         </>
-    )}
+    )
 };
+
+export default Register;

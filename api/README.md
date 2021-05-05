@@ -1,99 +1,43 @@
-###### WEMAKE IMPACT
-
-### Technology Stack
-* [FastAPI](https://fastapi.tiangolo.com/), 
-* [Python](https://www.python.org/downloads/release/python-3710) Python 3.8,
-* [Pipenv](https://pipenv-fork.readthedocs.io/en/latest) to manage all dependencies (and sub-dependencies)
+# Product Name
+> Short blurb about what your product does.
+This is the backend engine for We Make Impacts's Tapgives initiative to provide clean water for domestic use
+for as many homes at the coastal region of Kenya to 
 
 
-### Project structure:
+## Preliquisites
 ```
-.
-├── wemakeimpact
-    ├── user-service
-        ├── Dockerfile
-        ├── Pipfile
-        ├── Pipfile.lock
-        ├── app
-            ├── __init__.py
-            ├── config.py
-            ├── main.py
-    ├── projects-service
-        ├── Dockerfile
-        ├── Pipfile
-        ├── Pipfile.lock
-        ├── app
-             ├── main.py
-             ├── config.py
-             ├── api
-                ├── __init__.py
-                ├── db.py
-                ├── processes.py
-                ├── projects.py
-                ├── schema.py
-    ├── subscription-servise
-        ├── Dockerfile
-        ├── Pipfile
-        ├── Pipfile.lock
-        ├── app
-            ├── main.py
-            ├── config.py
-            ├── api
-                ├── __init__.py
-                ├── db.py
-                ├── manage.py
-                ├── projects.py
-                ├── schema.py
-    ├── .dockerignore
-    ├── .env.example
-    ├── .gitignore
-    ├── Makefile
-    ├── nginx.conf
-    ├── docker-compose.yml
-    ├── README.md
-
+docker
+docker-compose
 ```
 
-### Project setup
-###### Assuming docker is pre-installed
-
-###### Environment File
-Example `.env.example` file:
-
-```bash
-
-POSTGRES_PASSWORD=
-POSTGRES_USER=app
-POSTGRES_DB=tapgives_db
-POSTGRES_SERVER=db
-POSTGRES_PORT=
-
-SECRET=
-
-WEB_PORT = 4000
-
-```
-
-##### Api Access path for all the services
-```
-default http path: http://127.0.0.1:4000/api/v1/{service}/docs
-```
-###### Service names
-* users :            ```from user-service```
-* projects:    ``` from projects-service```
-
-##### Development/Production environment propagation
+## Run  application
 ```
 make stack
 ```
-
-##### Development/Production environment destroy
+## Access API documentation
 ```
-make tearstack
+http://yourhost:4000/api/v1/docs
 ```
 
-### Contribution guidelines
+## Development setup
 
-* Code review
-* Other guidelines
-* Contact [repo owner](mailto:rexynewton79@gmail.com) for more details.
+Describe how to install all development dependencies and how to run an automated test-suite of some kind. Potentially do this for multiple platforms.
+
+```
+make test
+```
+
+## Release History
+* 0.0.1
+    * Work in progress
+
+## Meta
+
+Ujuzi Code LTD – [@ujuzicode](https://twitter.com/ujuzicode) 
+
+Built at Ujuzi Code Ltd Nairobi Kenya
+
+[https://github.com/yourname/github-link](https://github.com/dbader/)
+
+## Contributing
+*section coming up*
