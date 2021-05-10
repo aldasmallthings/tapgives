@@ -1,6 +1,6 @@
 # Tapgives
 This is the backend engine for We Make Impacts's Tapgives initiative to provide clean water for domestic use
-for as many homes at the coastal region of Kenya to 
+for as many homes at the coastal region of Kenya.
 
 
 ## Preliquisites
