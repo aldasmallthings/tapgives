@@ -1,3 +1,4 @@
+from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 
 from app.crud.base import CRUDBase
@@ -8,15 +9,15 @@ from app.schema import SubscriptionCreate, SubscriptionUpdate
 class CRUDSubscription(CRUDBase[Subscription, SubscriptionCreate, SubscriptionUpdate]):
 
     def get(self, db: Session):
-        return db.query().all()
+        return db.query(self.model).filter(self.model.is_active == True).all()
 
     def get_subscription(self, db: Session, id: int):
         return db.query(self.model).filter(self.model.id == id).first()
 
-    def create(self, db: Session, *, obj_in: SubscriptionCreate, user_id: int):
+    def create(self, db: Session, *, obj_in: SubscriptionCreate, id: int):
         obj_in_data = jsonable_encoder(obj_in)
         db_obj = self.model(
-            user_id=user_id,
+            created_by=id,
             **obj_in_data,
         )
         return db_obj.save(db)

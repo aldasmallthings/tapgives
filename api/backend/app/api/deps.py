@@ -6,10 +6,11 @@ from jose import jwt
 from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
-from app.crud import user
+from app import crud
 from app.db import security
 from app.db.session import SessionLocal
 from app.model import User
+from app.schema import TokenPayload
 from core.config import settings
 
 reusable_oauth2 = OAuth2PasswordBearer(
@@ -30,16 +31,17 @@ def get_current_user(
 ) -> User:
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[security.ALGORITHM])
-        token_data = schemas.TokenPayload(**payload)
+        token_data = TokenPayload(**payload)
     except (jwt.JWTError, ValidationError):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Could not validate credentials",
         )
-    user = user.get(db, id=token_data.sub)
+    user = crud.user.get(db, id=token_data.sub)
     if not user:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found",
         )
     return user
 
@@ -47,9 +49,10 @@ def get_current_user(
 def get_current_active_user(
     current_user: User = Depends(get_current_user),
 ) -> User:
-    if not user.is_active(current_user):
+    if not crud.user.is_active(current_user):
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Inactive user"
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Inactive user",
         )
     return current_user
 
@@ -57,7 +60,7 @@ def get_current_active_user(
 def get_current_active_superuser(
     current_user: User = Depends(get_current_user),
 ) -> User:
-    if not user.is_superuser(current_user):
+    if not crud.user.is_superuser(current_user):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="The user doesn't have enough privileges",
@@ -68,7 +71,7 @@ def get_current_active_superuser(
 def get_current_active_admin(
     current_user: User = Depends(get_current_user),
 ) -> User:
-    if not user.is_admin(current_user):
+    if not crud.user.is_admin(current_user):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="The user doesn't have enough privileges",

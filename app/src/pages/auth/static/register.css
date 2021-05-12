@@ -3,11 +3,11 @@
     --toggle: #6A4441;
 }
 
-
 .register{
     font-size: 200%;
     width:78%;
     margin-left: 11%;
+    /* margin-bottom: 5%; */
     font-weight: bolder;
     font-family: 'Heebo', sans-serif;
 }
@@ -94,7 +94,7 @@
     cursor: pointer;
     border: 1px solid transparent;
 }
-#error{
+.password-errors{
     color: red;
     font-size: 50%;
 }
@@ -109,9 +109,13 @@
         display:inline-block;
         width: 100%;
     }
+    .form-col{
+        font-size: 80%;
+        height:auto;
+    }
     .form-col input{
         border: 1.5px solid #292424;
-        padding: 2px 2px;
+        padding-left: 4px;
         border-radius: 5px;
         width: 80%;
     }
@@ -119,10 +123,6 @@
         font-weight: bolder;
         font-size: 45%;
         margin-top: 5%;
-    }
-    #error{
-        color: red;
-        font-size: 30%;
     }
 }
 
@@ -137,18 +137,18 @@
         display:inline-block;
         width: 100%;
     }
+    .form-col{
+        height:auto;
+    }
     .form-col input{
         border: 1.5px solid #292424;
+        padding-left: 4px;
         border-radius: 5px;
-        width: 80%;
+        width: 100%;
     }
     .formtext{
         font-weight: bolder;
         font-size: 40%;
         margin-top: 2%;
-    }
-    #error{
-        color: red;
-        font-size: 30%;
     }
 }

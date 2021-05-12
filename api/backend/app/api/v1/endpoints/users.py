@@ -13,7 +13,7 @@ from core.config import settings
 router = APIRouter()
 
 
-@router.get("/", response_model=List[schema.User])
+@router.get("/", response_model=List[schema.UserResponse])
 def read_users(
     db: Session = Depends(deps.get_db),
     skip: int = 0,
@@ -49,12 +49,11 @@ def read_users(
     return data
 
 
-@router.post("/", response_model=schema.User, status_code=status.HTTP_201_CREATED)
+@router.post("/", response_model=schema.UserResponse, status_code=status.HTTP_201_CREATED)
 def create_user(
     *,
     db: Session = Depends(deps.get_db),
     user_in: schema.UserCreate,
-    current_user: model.User = Depends(deps.get_current_active_superuser),
 ):
     """
     Create new user.
@@ -67,33 +66,36 @@ def create_user(
         )
     user = crud.user.create(db, obj_in=user_in)
 
-    if user_in.user is not None:
-        user = crud.user.create(db, user_in.user, user.id)
 
     if settings.EMAILS_ENABLED and user_in.email:
         send_new_account_email(
             email_to=user_in.email,
-            username=user_in.email,
+            username=user_in.name,
             password=user_in.password,
         )
+
+    if settings.SMS_ENABLED and user_in.phone:
+        send_new_account_sms(
+            sms_to=user_in.phone,
+            username=user_in.name,
+            password=user_in.password,
+        )
+
     data = user.__dict__
     data["user"] = dict(
+        name=user.name,
+        email=user.email,
         phone=user.phone,
-        id_no=user.id_no,
-        title=user.title,
-        biography=user.biography,
-        gender=user.gender,
-        organization=user.organization,
     )
     return data
 
 
-@router.put("/update", response_model=schema.User)
+@router.put("/update", response_model=schema.UserResponse)
 def update_user_me(
     *,
     db: Session = Depends(deps.get_db),
     password: str = Body(None),
-    full_name: str = Body(None),
+    name: str = Body(None),
     email: EmailStr = Body(None),
     current_user: model.User = Depends(deps.get_current_active_user),
 ):
@@ -104,8 +106,8 @@ def update_user_me(
     user_in = schema.UserUpdate(**current_user_data)
     if password is not None:
         user_in.password = password
-    if full_name is not None:
-        user_in.full_name = full_name
+    if name is not None:
+        user_in.name = name
     if email is not None:
         user_in.email = email
     user = crud.user.update(
@@ -113,20 +115,17 @@ def update_user_me(
         db_obj=current_user,
         obj_in=user_in,
     )
-    user = crud.user.get_user(db, user.id)
+    # user = crud.user.get_user(db, user.id)
     data = user.__dict__
     data["user"] = dict(
+        email=user.email,
+        name=user.name,
         phone=user.phone,
-        id_no=user.id_no,
-        title=user.title,
-        biography=user.biography,
-        gender=user.gender,
-        organization=user.organization,
     )
     return data
 
 
-@router.get("/user", response_model=schema.User)
+@router.get("/user", response_model=schema.UserResponse)
 def read_user_me(
     db: Session = Depends(deps.get_db),
     current_user: model.User = Depends(deps.get_current_active_user),
@@ -135,18 +134,18 @@ def read_user_me(
     Get current user.
     """
     user = crud.user.get(db, current_user.id)
-    data = current_user.__dict__
-    data.pop('password')    
+    data = current_user.__dict__  
     return data
 
 
-@router.post("/open", response_model=schema.User, status_code=status.HTTP_201_CREATED)
+@router.post("/open", response_model=schema.UserResponse, status_code=status.HTTP_201_CREATED)
 def create_user_open(
     *,
     db: Session = Depends(deps.get_db),
     password: str = Body(...),
     email: EmailStr = Body(...),
-    full_name: str = Body(None),
+    name: str = Body(None),
+    phone:str = Body(...)
 ):
     """
     Create new user without the need to be logged in.
@@ -163,15 +162,16 @@ def create_user_open(
             detail="The user with this username already exists in the system",
         )
     user_in = schema.UserCreate(
+        phone=phone,
         password=password,
         email=email,
-        full_name=full_name,
+        name=name,
     )
     user = crud.user.create(db, obj_in=user_in)
     return user
 
 
-@router.get("/{user_id}", response_model=schema.User)
+@router.get("/{user_id}", response_model=schema.UserResponse)
 def read_user_by_id(
     user_id: int,
     current_user: model.User = Depends(deps.get_current_active_user),
@@ -202,7 +202,7 @@ def read_user_by_id(
     return data
 
 
-@router.put("/{user_id}", response_model=schema.User)
+@router.put("/{user_id}", response_model=schema.UserResponse)
 def update_user(
     *,
     db: Session = Depends(deps.get_db),
@@ -251,7 +251,7 @@ def update_user(
     return data
 
 
-@router.put("/{user_id}/user", response_model=schema.User)
+@router.put("/{user_id}/user", response_model=schema.UserResponse)
 def update_user(
     *,
     db: Session = Depends(deps.get_db),

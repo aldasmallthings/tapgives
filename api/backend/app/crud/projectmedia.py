@@ -13,6 +13,7 @@ class CRUDProjectMedia(CRUDBase[ProjectMedia, ProjectMediaCreate, ProjectMediaUp
     def create(self, db: Session, *, obj_in: ProjectMediaCreate, id: int):
         obj_in_data = jsonable_encoder(obj_in)
         db_obj = self.model(
+            created_by = id,
             **obj_in_data,
         )
         return db_obj.save(db)

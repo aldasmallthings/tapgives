@@ -42,7 +42,7 @@ def read_project(
     return project
 
 
-@router.post("/", response_model=schema.Project, status_code=status.HTTP_201_CREATED)
+@router.post("/",status_code=status.HTTP_201_CREATED)
 def create_project(
     *,
     db: Session = Depends(deps.get_db),
@@ -52,7 +52,7 @@ def create_project(
     """
     Create new project.
     """
-    if not crud.user.is_superuser(current_user) or not crud.user.is_admin(current_user):
+    if not crud.user.is_active(current_user):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Not enough permissions",

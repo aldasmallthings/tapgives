@@ -10,6 +10,7 @@
     margin-left: 11%;
     margin-top: 2rem;  
     margin-bottom: 2rem;
+    padding-bottom: 2rem;
 }
 
 .login-banner{
@@ -20,8 +21,24 @@
 }
 
 .login-form-group{
-    width: 60%;
+    align-content: center;
+    width: 90%;
 }
+/* errors */
+.login-error{
+    margin: 3rem;
+    color: rgb(150, 32, 32);
+    font-size: 110%;
+    font-weight: 900;
+}
+
+.phone-error{
+    margin-bottom: 1rem;
+    color: rgb(150, 32, 32);
+    font-size: 110%;
+    font-weight: 900;
+}
+
 .login-form-col{
     margin-top: 2rem;
     width: 50%;
@@ -29,16 +46,18 @@
 .login-form-col .label{
     font-size: 100%;
 }
+
 .login-form-col input{
     border: 1px solid;
+    width: 100%;
     border-radius: 5px;
-    padding: .5rem 1rem;
+    padding: .8rem 1.5rem;
 }
 .submit{
     padding: .5rem 5rem;
 }
 .login-redirect{
-    padding-top: 2%;
+    margin-top: 4%;
     color: #3A3535;
     font-size: 130%;
     font-weight:900;
@@ -50,7 +69,6 @@
 @media screen and (max-width: 960px){
     .login-banner{
         margin-top: 5%;
-        font-size: 80%;
         font-weight: bolder;
         color:#845755;  
     }
@@ -62,9 +80,6 @@
     }
     .submit{
         padding: .5rem 3rem;
-    }
-    .login-redirect{
-        font-size: 90%;
     }
     .login-redirect-link{
         color:#D09392;

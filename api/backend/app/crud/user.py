@@ -1,5 +1,6 @@
 from typing import Any, Dict, Union
 
+
 from sqlalchemy.orm import Session
 
 from app.crud.base import CRUDBase
@@ -9,7 +10,7 @@ from app.schema import UserCreate, UserUpdate
 
 
 class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
-    def get(self, db: Session, *, id: int):
+    def get_user(self, db: Session, *, id: int):
         return db.query(self.model).filter(self.model.id == id).first()
 
     def get_by_email(self, db: Session, *, email: str):
@@ -23,9 +24,10 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
 
     def create(self, db: Session, *, obj_in: UserCreate):
         db_obj = self.model(
+            name = obj_in.name,
+            phone = obj_in.phone,
             email=obj_in.email,
             password=get_password_hash(obj_in.password),
-            full_name=obj_in.full_name,
             is_superuser=obj_in.is_superuser,
         )
         return db_obj.save(db)

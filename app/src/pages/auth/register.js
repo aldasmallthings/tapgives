@@ -1,18 +1,14 @@
-import './static/register.css';
 import Navbar from '../../components/navbar/nav';
 import Button  from '../../components/button/loginbtn';
 import Togglebtn from '../../components/button/togglebnt';
 import Formbtn from './../../components/button/formbtn';
-import  useForm  from '../../utils/hooks/useForm'
-import { validateRegistrationInput as validate }from '../../utils/validateInput'
- 
+import  RegisterForm  from '../../utils/hooks/registerForm'
 
-let Register = ({submitForm}) =>{   
-        const {handleChange,values,handleSubmit,errors} = useForm(submitForm,validate);
-        let errorStyles = {
-            color: 'red',
-            fontSize: '90%'
-        }  
+import './static/register.css';
+
+
+const Register = () =>{   
+        const {handleChange,values,handleSubmit,errors} = RegisterForm();
     
     return(
         <>
@@ -129,7 +125,7 @@ let Register = ({submitForm}) =>{
                                         />
                                     </div>
                                     <label id="error" 
-                                        style={errorStyles}>
+                                        className="password-errors">
                                         {errors.password}
                                         </label> 
                                 </div>
@@ -151,7 +147,8 @@ let Register = ({submitForm}) =>{
                                         value = {values.password2 }
                                         />
                                     </div> 
-                                    <label id="error" style={errorStyles}>
+                                    <label id="error" 
+                                    className="password-errors">
                                             {errors.password2}
                                         </label>
                                 </div>

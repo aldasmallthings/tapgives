@@ -9,90 +9,65 @@ from app.api import deps
 router = APIRouter()
 
 
-@router.get("/", response_model=List[schema.Subscription])
+@router.get("/{user_id}")
 def read_subscriptions(
+    *,
     db: Session = Depends(deps.get_db),
     skip: int = 0,
     limit: int = 100,
+    user_id: int,
     current_user: model.User = Depends(deps.get_current_active_user),
 ):
     """
     Retrieve Subscriptions
     """
     if crud.user.is_superuser(current_user):
-        get_subscriptions = crud.subscription.get(
-            db=db,
-            created_by=current_user.id,
-            skip=skip,
-            limit=limit,
-        )
+        get_subscriptions = crud.usersubscription.get_user_subscription(db=db,id = user_id) 
     
-    subscription_list = []
-    for sub in get_subscriptions:
-        subscription_list.append(sub)
-    return  subscription_list
+    return  get_subscriptions
     
 
 @router.post(
-    "/", response_model=schema.Subscription, status_code=status.HTTP_201_CREATED
+    "/", status_code=status.HTTP_201_CREATED
 )
 def create_subscription(
     *,
     db: Session = Depends(deps.get_db),
-    qo_in: schema.SubscriptionCreate,
+    sub_in: schema.UserSubscriptionCreate,
     current_user: model.User = Depends(deps.get_current_active_user),
 ):
     """
-    Create a new question with options.
+    Create a new user subscription.
     """
-    if not crud.user.is_superuser(current_user) or not crud.user.is_admin(current_user):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Not enough permissions",
-        )
 
-    if not crud.module.get(db=db, id=qo_in.question.module_id):
+    if not crud.user.is_active(user=current_user):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Module not found",
+            detail="Not enough permisions to perform this operation",
         )
 
-    if not crud.question.get(
-        db=db, text=qo_in.question.text, module_id=qo_in.question.module_id
-    ):
-        question = crud.question.create_with_owner(
-            db=db,
-            obj_in=qo_in.question,
-            created_by=current_user.id,
+
+    if not crud.user.get(db=db, id=sub_in.user_id):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="user not found",
         )
 
-    options = list()
-    for op_in in qo_in.option:
-        if not crud.option.get(db=db, text=op_in.text):
-            option = crud.option.create_with_owner(
-                db=db, obj_in=op_in, created_by=current_user.id
-            )
-            options.append(option)
-        else:
-            option = crud.option.get(db=db, text=op_in.text)
-            options.append(option)
+    if not crud.subscription.get_subscription(db=db, id=sub_in.sub_id):
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Subscription not found",
+        )
 
-    if not crud.option.get_with_options(db=db, question_id=question.id):
-        for opt in options:
-            qo = model.subscription(
-                question_id=question.id,
-                option_id=opt.id,
-                created_by=current_user.id,
-            ).save(db=db)
-
-    return dict(
-        question=question,
-        option=options,
-        created_by=current_user.id,
-    )
+    usersub = crud.usersubscription.create(
+        db=db, obj_in=sub_in, id=current_user.id
+        )
+    data = usersub
+    
+    return data
 
 
-@router.delete("/{question_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{usersubscription_id}", response_model = schema.UserSubscriptionBase)
 def delete_subscription(
     *,
     db: Session = Depends(deps.get_db),
@@ -102,7 +77,7 @@ def delete_subscription(
     """
     Delete a question option.
     """
-    subscriptions = crud.subscription.get_with_options(db=db, question_id=question_id)
+    subscriptions = crud.usersubscription.get(db=db, question_id=question_id)
 
     for subscription in subscriptions:
         if not subscription:

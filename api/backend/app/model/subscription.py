@@ -15,10 +15,9 @@ class Subscription(Base):
     token_type = Column(String, index=True)
     token_amount = Column(Integer, index=True)
     token_cadance = Column(String, index=True)
+    is_active = Column(Boolean, default=True)
     created_by = Column(Integer, ForeignKey("user.id"))
     updated_by = Column(Integer, ForeignKey("user.id"), nullable=True)
-    created_on = Column(DateTime,default = datetime.datetime.now())
-    updated_on = Column(DateTime, onupdate=datetime.datetime.now)
 
 
 class UserSubscription(Base): 
@@ -30,5 +29,3 @@ class UserSubscription(Base):
     is_active = Column(Boolean, default=True)
     created_by = Column(Integer, ForeignKey("user.id"))
     updated_by = Column(Integer, ForeignKey("user.id"), nullable=True)
-    created_on = Column(DateTime,default = datetime.datetime.now())
-    updated_on = Column(DateTime, onupdate=datetime.datetime.now)

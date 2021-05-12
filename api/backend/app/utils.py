@@ -89,6 +89,9 @@ def send_new_account_email(email_to: str, username: str, password: str):
         },
     )
 
+def send_new_account_sms(sms_to: str, username: str, password: str):
+    pass
+
 
 def generate_password_reset_token(email: str):
     delta = timedelta(hours=settings.EMAIL_RESET_TOKEN_EXPIRE_HOURS)

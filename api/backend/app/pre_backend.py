@@ -1,6 +1,19 @@
+from pathlib import Path
+import sys
+
+file = Path(__file__).resolve()
+package_root_directory = file.parents[1]
+sys.path.append(str(package_root_directory))
+
 import logging
 
-from tenacity import after_log, before_log, retry, stop_after_attempt, wait_fixed
+from tenacity import (
+    after_log,
+    before_log,
+    retry,
+    stop_after_attempt,
+    wait_fixed,
+)
 
 from app.db.init_db import init_db
 from app.db.session import SessionLocal
@@ -36,10 +49,10 @@ def db_init():
 def main():
     logger.info("Initializing service..")
     app_init()
-    logger.info("Service finished initializing.")
-    logger.infor("Creating initial data..")
+    logger.info("Service finished initializing.\n")
+    logger.info("Creating initial data..")
     db_init()
-    logger.info("Initial data created.")
+    logger.info("Initial data created.\n")
 
 
 if __name__ == "__main__":

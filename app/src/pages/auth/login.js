@@ -1,30 +1,14 @@
-import React, {Component} from 'react'
+import React from 'react'
 import Navbar from '../../components/navbar/nav'
 import Button  from '../../components/button/regbtn';
 import { Link } from 'react-router-dom';
 import './static/login.css'
+import LoginForm from '../../utils/hooks/loginForm'
 
-export default class Login extends Component {
+let Login= () => {
+    
+    let {errors,handleChange,handleSubmit } = LoginForm();
 
-    handleSubmit = e => {
-        e.preventDefault();
-        let data = {
-            username:this.email,
-            password : this.password
-        }
-        fetch('http://localhost:4000/api/v1/auth/jwt/login',{
-            method:'POST',
-            body: JSON.stringify(data),
-            header:{
-                'Content-Type':'application/x-www-form-urlencoded'
-            }
-        })
-        .then(e=> JSON.stringify(e) )
-        .then(e=> console.log(e))
-        .catch(error=>console.log(error))
-    }
-
-    render() {
         return(
             <>
                 <Navbar component={Button} />
@@ -32,7 +16,26 @@ export default class Login extends Component {
                     <div className="login-banner" >
                         login to manage your account and subscriptions
                     </div>
-                    <form className="login-form-group" onSubmit={this.handleSubmit}>
+                    <div className="login-error" >
+                        {errors.loginerror }
+                    </div>
+                    <form className="login-form-group" onSubmit={handleSubmit}>
+                        <div className="login-form-col">                            
+                            <div className="label">
+                                <i className="fas fa-phone"></i>
+                                <label>
+                                    Phone
+                                </label> 
+                            </div> 
+                            <div className="phone-error" >
+                                {errors.phone}
+                            </div>  
+                            <div>
+                                <input name = "phone" type="text" placeholder=" 07** *** ***" required
+                                onChange={handleChange}
+                                />
+                            </div>             
+                        </div>
                         <div className="login-form-col">
                             <div className="label">
                                 <i className="fas fa-envelope"></i>
@@ -41,8 +44,8 @@ export default class Login extends Component {
                                 </label> 
                             </div>   
                             <div>
-                                <input type="email" placeholder="user@mail.com" required
-                                onChange={e => this.email = e.target.value}
+                                <input name = "email" type="email" placeholder="user@mail.com" required
+                                onChange={handleChange}
                                 />
                             </div>             
                         </div>
@@ -54,8 +57,8 @@ export default class Login extends Component {
                                 </label> 
                             </div>   
                             <div>
-                                <input type="password" placeholder="********" required
-                                onChange={e => this.password = e.target.value}
+                                <input type="password"  name = "password" placeholder="********" required
+                                onChange={ handleChange }
                                 />
                             </div> 
                         </div> 
@@ -75,5 +78,7 @@ export default class Login extends Component {
                 </div>
             </>
         )
-    }
 }
+
+
+export default Login;

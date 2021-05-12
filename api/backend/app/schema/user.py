@@ -26,3 +26,12 @@ class UserCreate(User):
 class UserUpdate(User):
     pass
 
+#response model
+class UserResponse(BaseModel):
+    name: Optional[str] = None
+    email: Optional[EmailStr] = None
+    phone: Optional[str] = None
+    is_active: Optional[bool] = True
+    is_staff: Optional[bool] = False
+    is_admin: Optional[bool] = False
+    is_superuser: bool = False

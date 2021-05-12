@@ -16,6 +16,3 @@ class User(Base):
     is_admin = Column(Boolean, default=False)
     is_superuser = Column(Boolean, default=False)
     updated_by = Column(Integer, ForeignKey("user.id"), nullable=True)
-    created_on = Column(DateTime,default = datetime.datetime.now())
-    updated_on = Column(DateTime, onupdate=datetime.datetime.now)
-    subscription = relationship("subscription", back_populates="%(class)s")

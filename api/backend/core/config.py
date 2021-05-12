@@ -73,6 +73,7 @@ class Settings(BaseSettings):
     EMAIL_RESET_TOKEN_EXPIRE_HOURS: int = 48
     EMAIL_TEMPLATES_DIR: str = "/app/email-templates/build"
     EMAILS_ENABLED: bool = False
+    SMS_ENABLED: bool = False
 
     @validator("EMAILS_ENABLED", pre=True)
     def get_emails_enabled(cls, v: bool, values: Dict[str, Any]) -> bool:
@@ -83,6 +84,8 @@ class Settings(BaseSettings):
         )
 
     EMAIL_TEST_USER: EmailStr = "test@example.com"  # type: ignore
+    FIRST_SUPERUSER_NAME : str
+    FIRST_SUPERUSER_PHONE: str
     FIRST_SUPERUSER: EmailStr
     FIRST_SUPERUSER_PASSWORD: str
     USERS_OPEN_REGISTRATION: bool = False

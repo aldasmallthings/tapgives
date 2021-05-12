@@ -1,5 +1,3 @@
-import datetime
-
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Text, Time,Boolean
 from sqlalchemy.orm import relationship
 
@@ -15,29 +13,23 @@ class Project(Base):
     is_active = Column(Boolean,default=True)
     created_by = Column(Integer, ForeignKey("user.id"))
     updated_by = Column(Integer, ForeignKey("user.id"), nullable=True)
-    created_on = Column(DateTime,default = datetime.datetime.now())
-    updated_on = Column(DateTime, onupdate=datetime.datetime.now)
 
 
 class ProjectTeam(Base):
     id = Column(Integer, primary_key=True, index=True)
-    project_id = Column(Integer,ForeignKey('projects.id'))
+    project_id = Column(Integer,ForeignKey('project.id'))
     user_id = Column(Integer,ForeignKey('user.id'))
     role = Column(String,nullable=False)
     is_active = Column(Boolean,default=True)
     created_by = Column(Integer, ForeignKey("user.id"))
     updated_by = Column(Integer, ForeignKey("user.id"), nullable=True)
-    created_on = Column(DateTime,default = datetime.datetime.now())
-    updated_on = Column(DateTime, onupdate=datetime.datetime.now)
 
 
 
 class ProjectMedia(Base):
     id = Column(Integer, primary_key=True, index=True)
-    project_id = Column(Integer,ForeignKey('projects.id'))
+    project_id = Column(Integer,ForeignKey('project.id'))
     media_id = Column(String,nullable = False)
     is_profile = Column(Boolean,default=True)
     created_by = Column(Integer, ForeignKey("user.id"))
     updated_by = Column(Integer, ForeignKey("user.id"), nullable=True)
-    created_on = Column(DateTime,default = datetime.datetime.now())
-    updated_on = Column(DateTime, onupdate=datetime.datetime.now)

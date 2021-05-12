@@ -29,67 +29,38 @@ def read_subscriptions(
     
     subscription_list = []
     for sub in get_subscriptions:
+        print(sub)
         subscription_list.append(sub)
     return  subscription_list
     
 
 @router.post(
-    "/", response_model=schema.Subscription, status_code=status.HTTP_201_CREATED
+    "/", status_code=status.HTTP_201_CREATED
 )
 def create_subscription(
     *,
     db: Session = Depends(deps.get_db),
-    qo_in: schema.SubscriptionCreate,
+    obj_in: schema.SubscriptionCreate,
     current_user: model.User = Depends(deps.get_current_active_user),
 ):
     """
     Create a new question with options.
     """
-    if not crud.user.is_superuser(current_user) or not crud.user.is_admin(current_user):
+    if not crud.user.is_active(current_user):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Not enough permissions",
         )
 
-    if not crud.module.get(db=db, id=qo_in.question.module_id):
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Module not found",
+    sub = crud.subscription.create(
+        db=db, obj_in=obj_in, id=current_user.id
         )
+    data = []
+    if sub:
+        get_sub = crud.subscription.get_subscription(db=db,id = sub.id)
+        data.append(get_sub)
 
-    if not crud.question.get(
-        db=db, text=qo_in.question.text, module_id=qo_in.question.module_id
-    ):
-        question = crud.question.create_with_owner(
-            db=db,
-            obj_in=qo_in.question,
-            created_by=current_user.id,
-        )
-
-    options = list()
-    for op_in in qo_in.option:
-        if not crud.option.get(db=db, text=op_in.text):
-            option = crud.option.create_with_owner(
-                db=db, obj_in=op_in, created_by=current_user.id
-            )
-            options.append(option)
-        else:
-            option = crud.option.get(db=db, text=op_in.text)
-            options.append(option)
-
-    if not crud.option.get_with_options(db=db, question_id=question.id):
-        for opt in options:
-            qo = model.subscription(
-                question_id=question.id,
-                option_id=opt.id,
-                created_by=current_user.id,
-            ).save(db=db)
-
-    return dict(
-        question=question,
-        option=options,
-        created_by=current_user.id,
-    )
+    return data
 
 
 @router.delete("/{question_id}", status_code=status.HTTP_204_NO_CONTENT)
