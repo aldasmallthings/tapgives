@@ -10,7 +10,7 @@ phases:
       ## CONFIGURE THIS: Repo name, please make sure this repo exists in ECR
       - export IMAGE_REPO_NAME=api_backend
       # AWS cli version to login into ecr. This needs to be compatible with the version of boto3 in the requirements file
-      - export awscli_version=1.16.35
+      # - export awscli_version=1.16.35
 
   build:
     commands:
@@ -34,7 +34,7 @@ phases:
     commands:
     # Login to to ECR, this means code build has this role
     # fix awscli version so nothing breaks...
-      - pip install awscli==$awscli_version
+      # - pip install awscli==$awscli_version
       - echo Logging in to Amazon ECR...
       - $(aws ecr get-login --no-include-email --region $AWS_DEFAULT_REGION)
      #Push Docker Image
