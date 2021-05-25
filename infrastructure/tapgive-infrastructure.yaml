@@ -1,0 +1,109 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: TapGives template to create backend DB and Redis clusters.
+Parameters:
+  VpcId:
+    Type: 'AWS::EC2::VPC::Id'
+    Description: VpcId of your existing Virtual Private Cloud (VPC)
+    ConstraintDescription: must be the VPC Id of an existing Virtual Private Cloud.
+  Subnets:
+    Type: 'List<AWS::EC2::Subnet::Id>'
+    Description: The list of SubnetIds in your Virtual Private Cloud (VPC)
+    ConstraintDescription: >-
+      must be a list of at least two existing subnets associated with at least
+      two different availability zones. They should be residing in the selected
+      Virtual Private Cloud.
+  DBName:
+    Description: Postgres database name
+    Type: String
+    MinLength: '1'
+    MaxLength: '64'
+    AllowedPattern: '[a-zA-Z][a-zA-Z0-9]*'
+    ConstraintDescription: must begin with a letter and contain only alphanumeric characters.
+  DBUser:
+    NoEcho: 'true'
+    Description: Username for postgres database access
+    Type: String
+    MinLength: '1'
+    MaxLength: '16'
+    AllowedPattern: '[a-zA-Z][a-zA-Z0-9]*'
+    ConstraintDescription: must begin with a letter and contain only alphanumeric characters.
+  DBPassword:
+    NoEcho: 'true'
+    Description: Password for postgres database access
+    Type: String
+    MinLength: '8'
+    MaxLength: '41'
+    AllowedPattern: '[a-zA-Z0-9]*'
+    ConstraintDescription: must contain only alphanumeric characters.
+
+Resources:
+  RedisCluster:
+    Type: 'AWS::ElastiCache::CacheCluster'
+    Properties:
+      VpcSecurityGroupIds:
+        - !Ref RedisSecurityGroup
+      CacheSubnetGroupName: !Ref RedisSubnetGroup
+
+  RedisSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: Open redis for access
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '6379'
+          ToPort: '6379'
+          SourceSecurityGroupId: !Ref ECSSecurityGroup
+      VpcId: !Ref VpcId
+
+  RedisSubnetGroup:
+    Type: 'AWS::ElastiCache::SubnetGroup'
+    Properties:
+      DBSubnetGroupDescription: Redis Subnet Group
+      SubnetIds: !Ref Subnets
+
+  DBSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: Open database for access
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '5432'
+          ToPort: '5432'
+          SourceSecurityGroupId: !Ref ECSSecurityGroup
+      VpcId: !Ref VpcId
+
+  DBSubnetGroup:
+    Type: 'AWS::RDS::DBSubnetGroup'
+    Properties: 
+      DBSubnetGroupDescription: DB Subnet Group
+      SubnetIds: !Ref Subnets
+
+  AuroraPostgres:
+    Type: 'AWS::RDS::DBCluster'
+    Properties:
+      DatabaseName: !Ref DBName
+      Engine: aurora-postgresql
+      EngineMode: serverless
+      MasterUsername: !Ref DBUser
+      MasterUserPassword: !Ref DBPassword
+      StorageEncrypted: true
+      ScalingConfiguration:
+        AutoPause: true
+        MaxCapacity: 2
+        MinCapacity: 2
+        SecondsUntilAutoPause: 300
+      VpcSecurityGroupIds:
+        - !Ref DBSecurityGroup
+      DBSubnetGroupName: !Ref DBSubnetGroup
+
+  ECSSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: Open api for access
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '80'
+          ToPort: '80'
+          CidrIp: "0.0.0.0/0"
+      VpcId: !Ref VpcId
+
