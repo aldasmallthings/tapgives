@@ -5,41 +5,12 @@ services:
     # backend
     backend:
         container_name: tapgives_api
-#        build: ./backend
-#        command: bash -c "sh ./prestart.sh"
-        image: 951865465206.dkr.ecr.us-east-1.amazonaws.com/api_backend
+        build: ./backend
+        command: bash -c "sh ./prestart.sh"
+#        image: 951865465206.dkr.ecr.us-east-1.amazonaws.com/api_backend
         volumes:
             - ./backend/:/app/
         ports:
             - "80:80"
         env_file:
             - .env
-        depends_on:
-            - tapgives_db
-            - cache
-
-    # database
-    tapgives_db:
-        container_name: tapgives_db
-        image: postgres:alpine
-        volumes:
-            - data:/var/lib/postgresql/data/
-        environment:
-            - POSTGRES_USER=${POSTGRES_USER}
-            - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-            - POSTGRES_DB=${POSTGRES_DB}
-            - PGPORT=${POSTGRES_PORT}
-        ports:
-            - "${POSTGRES_PORT}:5436"
-        # restart: "on-failure:5"
-
-    # cache
-    cache:
-        container_name: tapgives_rds
-        image: redis:alpine
-        ports:
-            - "${REDIS_PORT}:6380"
-        restart: "always"
-
-volumes:
-  data:
