@@ -1,6 +1,9 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: TapGives template to create backend DB and Redis clusters.
 Parameters:
+  environment:
+    Type: String
+    Description: Environment name that will be added
   VpcId:
     Type: 'AWS::EC2::VPC::Id'
     Description: VpcId of your existing Virtual Private Cloud (VPC)
@@ -12,15 +15,16 @@ Parameters:
       must be a list of at least two existing subnets associated with at least
       two different availability zones. They should be residing in the selected
       Virtual Private Cloud.
-  DBName:
-    Description: Postgres database name
-    Type: String
-    MinLength: '1'
-    MaxLength: '64'
-    AllowedPattern: '[a-zA-Z][a-zA-Z0-9]*'
-    ConstraintDescription: must begin with a letter and contain only alphanumeric characters.
+  PublicSubnets:
+    Type: 'List<AWS::EC2::Subnet::Id>'
+    Description: The list of Public SubnetIds in your Virtual Private Cloud (VPC)
+    ConstraintDescription: >-
+      must be a list of at least two existing subnets associated with at least
+      two different availability zones. They should be residing in the selected
+      Virtual Private Cloud.
   DBUser:
     NoEcho: 'true'
+    Default: app
     Description: Username for postgres database access
     Type: String
     MinLength: '1'
@@ -35,53 +39,67 @@ Parameters:
     MaxLength: '41'
     AllowedPattern: '[a-zA-Z0-9]*'
     ConstraintDescription: must contain only alphanumeric characters.
+  ContainerPort:
+    Type: Number
+    Default: 80
+  ImageURI:
+    Type: String
+    Default: 951865465206.dkr.ecr.us-east-1.amazonaws.com/api_backend
 
 Resources:
   RedisCluster:
     Type: 'AWS::ElastiCache::CacheCluster'
     Properties:
+      ClusterName: !Sub tapgives${environment}
+      NumCacheNodes: 1
+      Engine: Redis
+      CacheNodeType: cache.t2.micro
       VpcSecurityGroupIds:
         - !Ref RedisSecurityGroup
-      CacheSubnetGroupName: !Ref RedisSubnetGroup
+      CacheSubnetGroupName: !Sub redis-subnet-group-${environment}
 
   RedisSecurityGroup:
     Type: 'AWS::EC2::SecurityGroup'
     Properties:
+      GroupName: !Sub redis-security-group-${environment}
       GroupDescription: Open redis for access
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: '6379'
           ToPort: '6379'
-          SourceSecurityGroupId: !Ref ECSSecurityGroup
+          SourceSecurityGroupId: !Ref ContainerSecurityGroup
       VpcId: !Ref VpcId
 
   RedisSubnetGroup:
     Type: 'AWS::ElastiCache::SubnetGroup'
     Properties:
-      DBSubnetGroupDescription: Redis Subnet Group
+      CacheSubnetGroupName: !Sub redis-subnet-group-${environment}
+      Description: Redis Subnet Group
       SubnetIds: !Ref Subnets
 
   DBSecurityGroup:
     Type: 'AWS::EC2::SecurityGroup'
     Properties:
+      GroupName: !Sub db-security-group-${environment}
       GroupDescription: Open database for access
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: '5432'
           ToPort: '5432'
-          SourceSecurityGroupId: !Ref ECSSecurityGroup
+          SourceSecurityGroupId: !Ref ContainerSecurityGroup
       VpcId: !Ref VpcId
 
   DBSubnetGroup:
     Type: 'AWS::RDS::DBSubnetGroup'
-    Properties: 
+    Properties:
+      DBSubnetGroupName: !Sub db-subnet-group-${environment}
       DBSubnetGroupDescription: DB Subnet Group
       SubnetIds: !Ref Subnets
 
   AuroraPostgres:
     Type: 'AWS::RDS::DBCluster'
     Properties:
-      DatabaseName: !Ref DBName
+      DatabaseName: !Sub tapgivesdb${environment}
       Engine: aurora-postgresql
       EngineMode: serverless
       MasterUsername: !Ref DBUser
@@ -96,14 +114,119 @@ Resources:
         - !Ref DBSecurityGroup
       DBSubnetGroupName: !Ref DBSubnetGroup
 
-  ECSSecurityGroup:
-    Type: 'AWS::EC2::SecurityGroup'
+  ExecutionRole:
+    Type: AWS::IAM::Role
     Properties:
-      GroupDescription: Open api for access
+      RoleName: !Sub ecs-execution-role-${environment}
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy'
+
+  Cluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: !Sub esc-cluster-${environment}
+      Tags:
+        - Key: environment
+          Value: !Ref environment
+
+  # Create a TaskDefinition with container details
+  TaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Memory: 512
+      Cpu: 256
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - 'FARGATE'
+      TaskRoleArn: !Ref ExecutionRole
+      ExecutionRoleArn: !Ref ExecutionRole
+      ContainerDefinitions:
+        - Name: !Sub ${environment}-backend-api-container
+          Image: !Ref ImageURI
+          PortMappings:
+            - ContainerPort: !Ref ContainerPort
+              HostPort: !Ref ContainerPort
+
+  # Create a security group for load balancer and open port 80 in bound from internet
+  LoadBalancerSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: !Sub load-balancer-sg-${environment}
+      VpcId: !Ref VpcId
       SecurityGroupIngress:
         - IpProtocol: tcp
-          FromPort: '80'
-          ToPort: '80'
-          CidrIp: "0.0.0.0/0"
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+
+  # Creat a security group for Containers and open in bound Container port from Load balancer security group to the Container
+  ContainerSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: !Sub container-sg-${environment}
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: !Ref ContainerPort
+          ToPort: !Ref ContainerPort
+          SourceSecurityGroupId: !Ref LoadBalancerSecurityGroup
+
+  # Create a LoadBalancer and attach the Security group and Subnets
+  LoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      IpAddressType: ipv4
+      Name: !Sub load-balancer-${environment}
+      Scheme: internet-facing
+      SecurityGroups:
+        - !Ref LoadBalancerSecurityGroup
+      Subnets: !Ref PublicSubnets
+      Type: application
+
+  # Create a TargetGroup for HTTP port 80
+  TargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: !Sub target-group-${environment}
+      Port: 80
+      Protocol: HTTP
+      TargetType: ip
       VpcId: !Ref VpcId
 
+  # Create a LoadBalancerListener and attach the TargetGroup and LoadBalancer
+  LoadBalancerListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+        - TargetGroupArn: !Ref TargetGroup
+          Type: forward
+      LoadBalancerArn: !Ref LoadBalancer
+      Port: 80
+      Protocol: HTTP
+
+  # Create an ECS Service and add created Cluster, TaskDefintion, Subnets, TargetGroup and SecurityGroup
+  ECSService:
+    Type: AWS::ECS::Service
+    DependsOn: LoadBalancerListener
+    Properties:
+      ServiceName: !Sub ecs-service-${environment}
+      Cluster: !Ref Cluster
+      TaskDefinition: !Ref TaskDefinition
+      DesiredCount: 2
+      LaunchType: FARGATE
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          Subnets: !Ref Subnets
+          SecurityGroups:
+            - !Ref ContainerSecurityGroup
+      LoadBalancers:
+        - ContainerName: !Sub ${environment}-backend-api-container
+          ContainerPort: !Ref ContainerPort
+          TargetGroupArn: !Ref TargetGroup

@@ -1,19 +1,21 @@
 version: '3.7'
 
+
 services:
     # backend
     backend:
         container_name: tapgives_api
-        build: ./backend
-        command: bash -c "sh ./prestart.sh"
+#        build: ./backend
+#        command: bash -c "sh ./prestart.sh"
+        image: 951865465206.dkr.ecr.us-east-1.amazonaws.com/api_backend
         volumes:
             - ./backend/:/app/
         ports:
-            - "${WEB_PORT}:80"
+            - "80:80"
         env_file:
             - .env
         depends_on:
-            - ${POSTGRES_SERVER}
+            - tapgives_db
             - cache
 
     # database
