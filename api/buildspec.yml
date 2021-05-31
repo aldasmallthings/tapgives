@@ -17,6 +17,7 @@ phases:
       ## Moving to backend folder
 #      - cd api/backend/
       - cd api/
+      - cp .env api/.env
 
       ## Build docker image
       - echo Building the Docker image...
