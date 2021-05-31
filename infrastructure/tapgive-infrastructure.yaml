@@ -218,7 +218,7 @@ Resources:
       ServiceName: !Sub ecs-service-${environment}
       Cluster: !Ref Cluster
       TaskDefinition: !Ref TaskDefinition
-      DesiredCount: 2
+      DesiredCount: 1
       LaunchType: FARGATE
       NetworkConfiguration:
         AwsvpcConfiguration:

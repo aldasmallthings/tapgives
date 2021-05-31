@@ -49,8 +49,8 @@ phases:
 
     # Update the service with the new image
       - aws ecs update-service --cluster esc-cluster-dev --service ecs-service-dev --force-new-deployment
+      - printf '{"ImageURI":"%s:%s"}' $IMAGE_REPO_NAME $LATEST_TAG > imagedefinitions.json
 
 artifacts:
   files:
-    - '**/*'
-  base-directory: buildoutput
+    - imagedefinitions.json
