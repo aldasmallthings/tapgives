@@ -7,7 +7,7 @@ services:
         container_name: tapgives_api
         build: ./backend
         command: bash -c "sh ./prestart.sh"
-#        image: 951865465206.dkr.ecr.us-east-1.amazonaws.com/api_backend
+        image: api_backend:latest
         volumes:
             - ./backend/:/app/
         ports:
