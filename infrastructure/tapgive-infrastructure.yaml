@@ -144,6 +144,7 @@ Resources:
       NetworkMode: awsvpc
       RequiresCompatibilities:
         - 'FARGATE'
+        - 'EC2'
       TaskRoleArn: !Ref ExecutionRole
       ExecutionRoleArn: !Ref ExecutionRole
       ContainerDefinitions:
@@ -219,7 +220,7 @@ Resources:
       Cluster: !Ref Cluster
       TaskDefinition: !Ref TaskDefinition
       DesiredCount: 1
-      LaunchType: FARGATE
+      LaunchType: EC2
       NetworkConfiguration:
         AwsvpcConfiguration:
           AssignPublicIp: ENABLED
