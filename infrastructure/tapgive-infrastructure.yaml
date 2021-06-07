@@ -143,12 +143,18 @@ Resources:
       Cpu: 256
       NetworkMode: awsvpc
       RequiresCompatibilities:
-        - 'FARGATE'
+        - 'EC2'
       TaskRoleArn: !Ref ExecutionRole
       ExecutionRoleArn: !Ref ExecutionRole
       ContainerDefinitions:
         - Name: !Sub ${environment}-backend-api-container
           Image: !Ref ImageURI
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-region: us-east-1
+              awslogs-group: /ecs/task-definition
+              awslogs-stream-prefix: ecs
           PortMappings:
             - ContainerPort: !Ref ContainerPort
               HostPort: !Ref ContainerPort
@@ -215,14 +221,14 @@ Resources:
     Type: AWS::ECS::Service
     DependsOn: LoadBalancerListener
     Properties:
-      ServiceName: !Sub ecs-service-${environment}
+      ServiceName: !Sub ecs-service-ec2-${environment}
       Cluster: !Ref Cluster
       TaskDefinition: !Ref TaskDefinition
       DesiredCount: 1
-      LaunchType: FARGATE
+      LaunchType: EC2
       NetworkConfiguration:
         AwsvpcConfiguration:
-          AssignPublicIp: ENABLED
+#          AssignPublicIp: ENABLED
           Subnets: !Ref Subnets
           SecurityGroups:
             - !Ref ContainerSecurityGroup
