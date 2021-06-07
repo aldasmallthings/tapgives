@@ -10,7 +10,7 @@ phases:
   pre_build:
     commands:
       ## CONFIGURE THIS: Repo name, please make sure this repo exists in ECR
-      - export IMAGE_REPO_NAME=api_backend
+      - export IMAGE_REPO_NAME=apibackend
       # AWS cli version to login into ecr. This needs to be compatible with the version of boto3 in the requirements file
       # - export awscli_version=1.16.35
 
