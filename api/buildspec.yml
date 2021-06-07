@@ -6,7 +6,7 @@ phases:
       - apt-get update
       - apt-get install zip
       - curl "https://s3.us-west-2.amazonaws.com/lightsailctl/latest/linux-amd64/lightsailctl" -o "/usr/local/bin/lightsailctl"
-      - sudo chmod +x /usr/local/bin/lightsailctl
+      - chmod +x /usr/local/bin/lightsailctl
   pre_build:
     commands:
       ## CONFIGURE THIS: Repo name, please make sure this repo exists in ECR
