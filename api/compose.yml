@@ -7,7 +7,7 @@ services:
         container_name: tapgives_api
         build: ./backend
 #        command: bash -c "sh ./prestart.sh"
-        image: api_backend:latest
+        image: apibackend:latest
         volumes:
             - ./backend/:/app/
         ports:
