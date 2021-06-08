@@ -7,16 +7,13 @@ phases:
       - apt-get install zip
       - curl "https://s3.us-west-2.amazonaws.com/lightsailctl/latest/linux-amd64/lightsailctl" -o "/usr/local/bin/lightsailctl"
       - chmod +x /usr/local/bin/lightsailctl
+
   pre_build:
     commands:
       ## CONFIGURE THIS: Repo name, please make sure this repo exists in ECR
       - export IMAGE_REPO_NAME=apibackend
       - export LATEST_TAG=latest
       - export VERSION_TAG=$(date '+%Y%m%d%H%M')
-
-      ## Get AWS Account Id
-      - export AWS_ACCOUNT_ID=$(echo $CODEBUILD_BUILD_ARN | cut -d':' -f 5)
-
 
   build:
     commands:
