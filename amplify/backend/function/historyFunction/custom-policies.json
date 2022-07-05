@@ -1,0 +1,13 @@
+[
+  {
+    "Action": [
+      "firehose:*"
+    ],
+    "Effect": "Allow",
+    "Resource": ["*"]
+  },
+  {
+    "Action": ["glue:*","s3:*"],
+    "Resource": ["*"]
+  }
+]

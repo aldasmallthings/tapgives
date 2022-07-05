@@ -1,0 +1,14 @@
+[
+  {
+    "Action": ["s3:*"],
+    "Resource": ["*"]
+  },
+  {
+    "Action": ["athena:*"],
+    "Resource": ["*"]
+  },
+  {
+    "Action": ["glue:*"],
+    "Resource": ["*"]
+  }
+]

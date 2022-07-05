@@ -1,0 +1,14 @@
+{
+  "lambdaLayers": [],
+  "environmentVariableList": [],
+  "permissions": {
+    "storage": {
+      "history": [
+        "create",
+        "read",
+        "update",
+        "delete"
+      ]
+    }
+  }
+}

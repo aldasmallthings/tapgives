@@ -1,0 +1,438 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  SAM Deployment for the USSD application
+
+
+Parameters:
+  ProjectName:
+    Type: String
+    Default: ussd-app
+    Description: A name to identify the project
+  EnvironmentName:
+    Type: String
+    Default: dev
+    Description: A name to identify environment (e.g. dev, prod)
+  PinpointShortcode:
+    Type: String
+    Description: Short code that sends SMS messages
+  MpesaAccountReference:
+    Type: String
+    Description: MPESA Account Reference
+  MpesaBusinessShortcode:
+    Type: String
+    Description: MPESA Business Shortcode
+  MpesaCallbackURL:
+    Type: String
+    Description: Callback URL to receive MPESA notifications
+  MpesaClientKey:
+    Type: String
+    Description: MPESA Client Key
+  MpesaClientSecret:
+    Type: String
+    Description: MPESA Client Secret
+  MpesaPassKey:
+    Type: String
+    Description: MPESA Pass Key
+
+
+Globals:
+  Function:
+    Timeout: 60
+    Handler: index.handler
+    Runtime: nodejs14.x
+    Environment:
+        Variables:
+          REGION: !Sub ${AWS::Region}
+          API_URL:  '{{resolve:ssm:GraphQLAPIEndpointOutput}}'
+          S3_BUCKET_NAME:  '{{resolve:ssm:BucketName}}'
+          LANGUAGES_FILE_PATH: 'public/basePhrases.json'
+          # action types
+          VISIT: "visit"
+          SUBSCRIPTION: "subscription"
+          UNSUBSCRIPTION: "unsubscription"
+          REMINDER_MESSAGE: "reminder message"
+          SUBSCRIPTION_MESSAGE: "subscription message"
+          UNSUBSCRIPTION_MESSAGE: "unsubscription message"
+          # subscription types
+          SUBSCRIPTION_VALID: "true"
+          SUBSCRIPTION_INVALID: "false"
+          # other types
+          NA: "N/A"
+          NONE: 0
+
+
+Resources:
+  
+  GraphQlLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub 'GraphQlLambdaRole-${AWS::Region}'
+      Description: Role used by lambda functions to access appsync graphql
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: !Sub '${ProjectName}-${EnvironmentName}-GraphQlLambdaPolicy'
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - appsync:GraphQL
+                Resource: '*'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  CreateCustomer:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub '${ProjectName}-${EnvironmentName}-CreateCustomer'
+      CodeUri: ./lambdaFunctions/CreateCustomer
+      Description: 'Creates a customer'
+      Role: !GetAtt GraphQlLambdaRole.Arn
+
+  GetCustomer:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub '${ProjectName}-${EnvironmentName}-GetCustomer'
+      CodeUri: ./lambdaFunctions/GetCustomer
+      Description: 'Gets a customer'
+      Role: !GetAtt GraphQlLambdaRole.Arn
+
+  GetSite:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub '${ProjectName}-${EnvironmentName}-GetSite'
+      CodeUri: ./lambdaFunctions/GetSite
+      Description: 'Gets a site'
+      Role: !GetAtt GraphQlLambdaRole.Arn
+
+  GetSiteManager:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub '${ProjectName}-${EnvironmentName}-GetSiteManager'
+      CodeUri: ./lambdaFunctions/GetSiteManager
+      Description: 'Gets a site manager'
+      Role: !GetAtt GraphQlLambdaRole.Arn
+  
+  UpdateCustomer:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub '${ProjectName}-${EnvironmentName}-UpdateCustomer'
+      CodeUri: ./lambdaFunctions/UpdateCustomer
+      Description: 'Updates a customer'
+      Environment:
+        Variables:
+          DAYS_OF_SUBSCRIPTION: '30'
+      Role: !GetAtt GraphQlLambdaRole.Arn
+  
+  CustomerComms:
+    Type: AWS::Pinpoint::App
+    Properties: 
+      Name: !Sub '${ProjectName}-${EnvironmentName}-CustomerComms'
+
+  SmsChannel:
+    Type: AWS::Pinpoint::SMSChannel
+    Properties: 
+      ApplicationId: !Ref CustomerComms
+      Enabled: TRUE
+      SenderId: TapGives
+      ShortCode: !Ref PinpointShortcode
+
+  SubscriptionMessaging:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub '${ProjectName}-${EnvironmentName}-SubscriptionMessaging'
+      CodeUri: ./lambdaFunctions/SubscriptionMessaging
+      Description: 'Send subscription messages to customers'
+      Environment:
+        Variables:
+          MESSAGE_TYPE: TRANSACTIONAL
+          PROJECT_ID: !Ref CustomerComms
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - mobiletargeting:SendMessages
+              Resource: !Sub '${CustomerComms.Arn}/*'
+            - Effect: Allow
+              Action:
+                - s3:GetObject
+              Resource: 'arn:aws:s3:::*'
+
+  BroadcastMessaging:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: BroadcastMessaging
+      CodeUri: ./lambdaFunctions/BroadcastMessaging
+      Description: 'Send messages to groups'
+      Environment:
+        Variables:
+          MESSAGE_TYPE: TRANSACTIONAL
+          PROJECT_ID: !Ref CustomerComms
+          GET_CUSTOMER_FUNCTION_NAME: !Ref GetCustomer
+          GET_SITE_MANAGER_FUNCTION_NAME: !Ref GetSiteManager
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - mobiletargeting:SendMessages
+              Resource: !Sub '${CustomerComms.Arn}/*'
+            - Effect: Allow
+              Action: 
+                - lambda:InvokeFunction
+              Resource: '*'
+
+  RecordCustomerTransactionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub 'RecordCustomerTransactionRole-${AWS::Region}'
+      Description: Role used by RecordCustomerTransation to call appsync and invoke lambdas
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: !Sub '${ProjectName}-${EnvironmentName}-RecordCustomerTransactionGraphQLPolicy'
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - appsync:GraphQL
+                Resource: '*'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaRole
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  RecordCustomerTransaction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub '${ProjectName}-${EnvironmentName}-RecordCustomerTransaction'
+      CodeUri: ./lambdaFunctions/RecordCustomerTransaction
+      Description: 'Records customer transactions'
+      Role: !GetAtt RecordCustomerTransactionRole.Arn
+      Environment:
+        Variables:
+          GET_CUSTOMER_FUNCTION_NAME: !Ref GetCustomer
+          CURRENCY: "KSH"
+          JERRYCANS: "jerrycans"
+          JERRYCANS_PER_TRIP: 1
+          SUCCESS: "success"
+          FAILURE: "failure"
+
+  RemindAndUnsubscribe:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub '${ProjectName}-${EnvironmentName}-RemindAndUnsubscribe'
+      CodeUri: ./lambdaFunctions/RemindAndUnsubscribe
+      Timeout: 300  # can change according to number of customers
+      Description: 'Lambda triggered daily to remind and unsubscribe customers'
+      Events:
+        DailyTrigger:
+          Type: Schedule
+          Description: 'Rule to invoke the RemindAndUnsubscribe lambda function daily'
+          Properties:
+            Schedule: rate(1 day)
+            Enabled: TRUE
+      Environment:
+        Variables:
+          DAYS_AHEAD_TO_REMIND: '2'
+          GET_CUSTOMER_FUNCTION_NAME: !Ref GetCustomer
+          UPDATE_CUSTOMER_FUNCTION_NAME: !Ref UpdateCustomer
+          SEND_SUBSCRIPTION_MESSAGES_FUNCTION_NAME: !Ref SubscriptionMessaging
+          RECORD_CUSTOMER_TRANSACTION_FUNCTION_NAME: !Ref RecordCustomerTransaction
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action: 
+                - lambda:InvokeFunction
+              Resource: '*'
+
+  UnirestDepLayer:
+      Type: AWS::Serverless::LayerVersion
+      Properties:
+          LayerName: unirest-layer
+          Description: Dependency for mpesa api calls [unirest]
+          ContentUri: ./layers/unirest
+  
+  InitiateMpesaPayment:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub '${ProjectName}-${EnvironmentName}-InitiateMpesaPayment'
+      CodeUri: ./lambdaFunctions/InitiateMpesaPayment
+      Layers:
+        - !Ref UnirestDepLayer
+      Description: 'Initiate mpesa payment'
+      Environment:
+        Variables:
+          ACCESS_TOKEN_URL: 'https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials'
+          ACCOUNT_REFERENCE: !Ref MpesaAccountReference
+          BUSINESS_SHORTCODE: !Ref MpesaBusinessShortcode
+          CALLBACK_URL: !Ref MpesaCallbackURL
+          CLIENT_KEY: !Ref MpesaClientKey
+          CLIENT_SECRET: !Ref MpesaClientSecret
+          INITIATE_URL: 'https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest'
+          PASS_KEY: !Ref MpesaPassKey
+    
+  ConfirmMpesaPayment:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub '${ProjectName}-${EnvironmentName}-ConfirmMpesaPayment'
+      CodeUri: ./lambdaFunctions/ConfirmMpesaPayment
+      Layers:
+        - !Ref UnirestDepLayer
+      Description: 'Confirm mpesa payment success'
+      Environment:
+        Variables:
+          QUERY_URL: 'https://sandbox.safaricom.co.ke/mpesa/stkpushquery/v1/query'
+
+  StateMachineRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Description: Role used by the Step Functions State Machine to log and invoke lambdas
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: states.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaRole
+  
+  MpesaStateMachineLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '${ProjectName}-${EnvironmentName}-MpesaStateMachineLogGroup'
+      RetentionInDays: 30
+
+  MpesaStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Name: !Sub '${ProjectName}-${EnvironmentName}-MpesaStateMachine'
+      DefinitionUri: ./stepFunctions/MpesaPaymentStateMachine.asl.json
+      DefinitionSubstitutions:
+        InitiateMpesaPaymentFunctionArn: !GetAtt InitiateMpesaPayment.Arn
+        ConfirmMpesaPaymentFunctionArn: !GetAtt ConfirmMpesaPayment.Arn
+        UpdateCustomerFunctionArn: !GetAtt UpdateCustomer.Arn
+        SubscriptionMessagingFunctionArn: !GetAtt SubscriptionMessaging.Arn
+        RecordCustomerTransactionFunctionArn: !GetAtt RecordCustomerTransaction.Arn
+      Logging:
+        Level: ALL
+        IncludeExecutionData: true
+        Destinations:
+          - CloudWatchLogsLogGroup:
+              LogGroupArn: !GetAtt MpesaStateMachineLogGroup.Arn
+      Role: !GetAtt StateMachineRole.Arn
+      Type: EXPRESS
+  
+  AfricasTalkingApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      # Cors:
+      #   AllowOrigin: "https://africastalking.com"
+      #   AllowMethods: "'POST'"
+      StageName: !Sub '${EnvironmentName}'
+      DefinitionBody:
+        openapi: '3.0.1'
+        info:
+          title: !Sub '${ProjectName}-${EnvironmentName}-AfricasTalkingUssdApi'
+          description: "Africa's Talking USSD Menu REST API"
+          version: "2022-03-13T00:20:16Z"
+        paths:
+          /:
+            post:
+              responses:
+                "200":
+                  description: "Default 200 response"
+              x-amazon-apigateway-integration:
+                httpMethod: "POST"
+                uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${USSDMenu.Arn}/invocations'
+                responses:
+                  default:
+                    statusCode: "200"
+                    responseTemplates:
+                      text/plain: "$input.path('$')"
+                requestTemplates:
+                  application/x-www-form-urlencoded: "{\r\n #foreach( $token in $input.path('$').split('&')\
+                    \ )\r\n #set( $keyVal = $token.split('=') )\r\n #set( $keyValSize\
+                    \ = $keyVal.size() )\r\n #if( $keyValSize >= 1 )\r\n \
+                    \  #set( $key = $util.urlDecode($keyVal[0]) )\r\n #if( $keyValSize\
+                    \ >= 2 )\r\n #set( $val = $util.urlDecode($keyVal[1]) )\r\
+                    \n #else\r\n #set( $val = '' )\r\n \
+                    \ #end\r\n \"$key\": \"$val\"#if($foreach.hasNext),#end\r\
+                    \n #end\r\n #end\r\n}"
+                passthroughBehavior: "when_no_templates"
+                contentHandling: "CONVERT_TO_TEXT"
+                type: "aws"
+
+  UssdMenuBuilderDepLayer:
+      Type: AWS::Serverless::LayerVersion
+      Properties:
+          LayerName: ussd-menu-builder-layer
+          Description: Dependency for ussd-menu [ussd-menu-builder]
+          ContentUri: ./layers/ussd-menu-builder
+
+  USSDMenuRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Description: Role used by USSDMenu to call invoke lambdas and step functions
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AWSLambdaExecute
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaRole
+        - arn:aws:iam::aws:policy/AWSStepFunctionsFullAccess
+
+  USSDMenu:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub '${ProjectName}-${EnvironmentName}-USSDMenu'
+      CodeUri: ./lambdaFunctions/USSDMenu
+      Layers:
+        - !Ref UssdMenuBuilderDepLayer
+      Description: 'Runs the menu interaction'
+      Role: !GetAtt USSDMenuRole.Arn
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref AfricasTalkingApi
+            Method: post
+            Path: / 
+      Environment:
+        Variables:
+          ENGLISH: "en"
+          SWAHILI: "sw"
+          JERRYCANS_PER_TRIP: 1
+          GET_SITE_FUNCTION_NAME: !Ref GetSite
+          GET_CUSTOMER_FUNCTION_NAME: !Ref GetCustomer
+          CREATE_CUSTOMER_FUNCTION_NAME: !Ref CreateCustomer
+          UPDATE_CUSTOMER_FUNCTION_NAME: !Ref UpdateCustomer
+          GET_SITE_MANAGER_FUNCTION_NAME: !Ref GetSiteManager
+          MPESA_PAYMENT_STEP_FUNCTION_ARN: !GetAtt MpesaStateMachine.Arn
+          RECORD_CUSTOMER_TRANSACTION_FUNCTION_NAME: !Ref RecordCustomerTransaction
+
+
+Outputs:
+  ApiGatewayEndpointUrl:
+    Description: "API Gateway endpoint URL for the USSD Menu function. To be passed as the Callback URL to Africa's Talking."
+    Value: !Sub "https://${AfricasTalkingApi}.execute-api.${AWS::Region}.amazonaws.com/${EnvironmentName}"
