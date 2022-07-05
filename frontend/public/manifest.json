@@ -1,9 +1,0 @@
-{
-  "short_name":"tapgives",
-  "name": "WeMakeImpact-tapgives project",
-  "icons":[],
-  "start_url": ".",
-  "display": "standalone",
-  "theme_color": "#F3E2E2",
-  "background_color": "#F3E2E2"
-}

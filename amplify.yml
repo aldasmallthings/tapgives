@@ -1,0 +1,27 @@
+version: 1
+backend:
+  phases:
+    build:
+      commands:
+        - export AWS_REGION=$(aws configure get region)
+        - sed "s|%REGION%|$AWS_REGION|g" amplify/backend/api/tapgiveschallenge/custom-roles.tmp > amplify/backend/api/tapgiveschallenge/custom-roles.json
+        - npm install -g @aws-amplify/cli
+        - '# Execute Amplify CLI with the helper script'
+        - amplifyPush --simple
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - '# Execute Amplify CLI with the helper script'
+        - amplifyPush --simple
+        - yarn install
+    build:
+      commands:
+        - yarn run build
+  artifacts:
+    baseDirectory: build
+    files:
+      - '**/*'
+  cache:
+    paths:
+      - node_modules/**/*

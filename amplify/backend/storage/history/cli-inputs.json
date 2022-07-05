@@ -1,0 +1,19 @@
+{
+  "resourceName": "history",
+  "policyUUID": "044f4941",
+  "bucketName": "tapgivesbucket",
+  "storageAccess": "authAndGuest",
+  "guestAccess": [
+    "READ"
+  ],
+  "authAccess": [
+    "READ"
+  ],
+  "groupAccess": {
+    "Admins": [
+      "CREATE_AND_UPDATE",
+      "READ",
+      "DELETE"
+    ]
+  }
+}

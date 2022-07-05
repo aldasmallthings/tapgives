@@ -1,0 +1,92 @@
+{
+    "Comment": "State machine that automates MPESA payment transactions.",
+    "StartAt": "InitiateMpesaPayment",
+    "States": {
+      "InitiateMpesaPayment": {
+        "Type": "Task",
+        "Resource": "${InitiateMpesaPaymentFunctionArn}",
+        "Next": "IsInitiationSuccessful"
+      },
+      "IsInitiationSuccessful": {
+        "Type": "Choice",
+        "Choices": [
+          {
+            "Variable": "$.isSuccess",
+            "BooleanEquals": true,
+            "Next": "Wait30Secs"
+          },
+          {
+            "Variable": "$.isSuccess",
+            "BooleanEquals": false,
+            "Next": "SubscriptionMessaging"
+          }
+        ]
+      },
+      "Wait30Secs": {
+        "Type": "Wait",
+        "Seconds": 30,
+        "Next": "ConfirmMpesaPayment"
+      },
+      "ConfirmMpesaPayment": {
+        "Type": "Task",
+        "Resource": "${ConfirmMpesaPaymentFunctionArn}",
+        "Next": "IsPaymentSuccessful"
+      },
+      "IsPaymentSuccessful": {
+        "Type": "Choice",
+        "Choices": [
+          {
+            "Variable": "$.isSuccess",
+            "BooleanEquals": true,
+            "Next": "UpdateCustomer"
+          },
+          {
+            "And": [
+              {
+                "Variable": "$.isSuccess",
+                "BooleanEquals": false
+              },
+              {
+                "Variable": "$.numChecks",
+                "NumericLessThanEquals": 3
+              }
+            ],
+            "Next": "Wait30Secs"
+          },
+          {
+            "And": [
+              {
+                "Variable": "$.isSuccess",
+                "BooleanEquals": false
+              },
+              {
+                "Variable": "$.numChecks",
+                "NumericGreaterThan": 3
+              }
+            ],
+            "Next": "SubscriptionMessaging"
+          }
+        ]
+      },
+      "UpdateCustomer": {
+        "Type": "Task",
+        "Resource": "${UpdateCustomerFunctionArn}",
+        "Next": "RecordUpdateTransaction"
+      },
+      "RecordUpdateTransaction": {
+        "Type": "Task",
+        "Resource": "${RecordCustomerTransactionFunctionArn}",
+        "Next": "SubscriptionMessaging"
+      },
+      "SubscriptionMessaging": {
+        "Type": "Task",
+        "Resource": "${SubscriptionMessagingFunctionArn}",
+        "Next": "RecordMessageTransaction"
+      },
+      "RecordMessageTransaction": {
+        "Type": "Task",
+        "Resource": "${RecordCustomerTransactionFunctionArn}",
+        "End": true
+      }
+    }
+  }

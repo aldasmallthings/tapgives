@@ -1,0 +1,3 @@
+{
+  "adminRoleNames": ["GraphQlLambdaRole-%REGION%","RecordCustomerTransactionRole-%REGION%"]
+}

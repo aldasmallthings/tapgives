@@ -1,0 +1,14 @@
+th{
+    font-weight:400;
+}
+thead{
+    font-size: large;
+    margin-left: 50px;
+}
+tr, tbody{
+    border-bottom: 1px #000000;
+}
+table{
+    /*border-collapse: collapse;*/
+    letter-spacing: 1px;
+}

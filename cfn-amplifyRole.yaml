@@ -1,0 +1,38 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Resources:
+
+  AmplifyRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: amplifyconsole-tapgives-backend-role
+      Description: IAM Role to deploy amplify Tapgives Project
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - amplify.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Path: /
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AdministratorAccess-Amplify
+        - arn:aws:iam::aws:policy/AWSGlueConsoleFullAccess
+        - arn:aws:iam::aws:policy/AmazonKinesisFirehoseFullAccess
+      Policies:
+        - PolicyName: geotrack-extended-policy
+          PolicyDocument: # JSON policy document
+            Version: '2012-10-17'
+            Statement: # allow read only access to all S3 buckets
+              - Effect: Allow
+                Action:
+                  - glue:*
+                  - ssm:*
+                  - ssm:AddTagsToResource
+                  - iam:ListPolicies
+                  - iam:CreatePolicies
+                  - iam:ReadPolicies
+                  - iam:ListRoles
+                  - iam:AttachRolePolicy
+                Resource: '*'

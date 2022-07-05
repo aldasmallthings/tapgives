@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "serviceConfiguration": {
+    "apiName": "tapgiveschallenge",
+    "serviceName": "AppSync",
+    "gqlSchemaPath": "C:\\Users\\jjrry\\IdeaProjects\\JS\\test\\amplify\\backend\\api\\tapgiveschallenge\\schema.graphql",
+    "defaultAuthType": {
+      "mode": "AMAZON_COGNITO_USER_POOLS",
+      "cognitoUserPoolId": "authtapgiveschallengec1d1ec61"
+    },
+    "additionalAuthTypes": [
+      {
+        "mode": "AWS_IAM"
+      }
+    ]
+  }
+}

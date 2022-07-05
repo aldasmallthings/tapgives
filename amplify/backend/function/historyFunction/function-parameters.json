@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "api": {
+      "tapgiveschallenge": [
+        "Query",
+        "Mutation",
+        "Subscription"
+      ]
+    },
+    "storage": {
+      "history": [
+        "create",
+        "read",
+        "update",
+        "delete"
+      ],
+      "Site:@model(appsync)": [
+        "create",
+        "read",
+        "update",
+        "delete"
+      ]
+    }
+  },
+  "lambdaLayers": []
+}

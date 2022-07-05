@@ -1,0 +1,22 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Parameters": {
+    "env": {
+      "Type": "String"
+    }
+  },
+  "Resources": {
+    "map": {
+      "Type": "AWS::Location::Map",
+      "Properties": {
+        "Configuration": {
+          "Style": "VectorEsriStreets"
+        },
+        "Description": "Maps for the siteManager interface",
+        "MapName": "MyMapName"
+      }
+    }
+  },
+  "Outputs": {},
+  "Description": "{\"createdOn\":\"Windows\",\"createdBy\":\"Amplify\",\"createdWith\":\"8.0.2\",\"stackType\":\"custom-customCloudformation\",\"metadata\":{}}"
+}

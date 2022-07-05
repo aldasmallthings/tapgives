@@ -1,0 +1,73 @@
+# Key notes:
+# 1. Customer->site one to one
+# 2. Customers can only have one subscription right now (can be changed by making it a composite key)
+
+# Has Duplicates to allow for better queries (composite of id/site)
+type SiteManager @model @auth(rules:[{allow: groups, groups:["Admins"]}
+    {allow: groups, groups:["SiteManagers"]}
+    {allow: public, provider: iam }]) {
+    id: ID! @primaryKey(sortKeyFields: ["siteID"]) @index(name: "bySiteManagerID", queryField: "siteManagerByID")
+    siteID: ID! @index(name: "bySite", queryField: "siteManagerBySite") # Site ID, must be scalar to be a sort key
+    site: Site @hasOne(fields:["siteID"])
+    phoneNumber: String! @index(name: "siteManagerByPhoneNumber", queryField: "siteManagerByPhoneNumber") # eg. +2549991234
+    preferredLanguage: String!
+}
+
+type Customer @model @auth(rules:[{allow: groups, groups:["Admins"]}
+    {allow: groups, groups:["SiteManagers"]}
+    {allow: public, provider: iam }]) {
+    id: ID!
+    siteID: ID! @index(name: "bySite", queryField: "customerBySite")# Site ID, must be scalar to be a sort key
+    site: Site @hasOne(fields:["siteID"])
+    validSubscription: String! # true, false, pending?
+    pin: Int!
+    phoneNumber: String! @index(name: "byPhoneNumber", queryField: "customerByPhoneNumber")
+    firstName: String! @index(name: "byFirstName", queryField: "customerByFirstName")
+    lastName: String!
+    preferredLanguage: String!
+    subscriptionExpiration: String! @index(name: "bySubscriptionExpiration", queryField: "customerBySubscriptionExpiration") # ISO 8601 (AWS timestamp)
+    monthlySubscriptionCode: String! @index(name: "byMonthlyCode", queryField: "customerByMonthlySubscriptionCode") # Code you enter at site (refreshes monthly)
+    jerrycansAllowed: Int! # Tracking remaining jerrycans, initialized to expectedJerryCans
+}
+# DynamoDB streams->Lambda to log status changes
+type Site @model @auth(rules:[{allow: groups, groups:["Admins"]}
+    {allow: groups, groups:["SiteManagers"]}
+    {allow: public, provider: iam }]) {
+    id: ID!
+    name: String!
+    nickname: String! @index(name: "byNickname", queryField: "siteByNickname") # can be queried, Must be all upper case
+    smsDescription: String! # short description for users (max 160 charc)
+    description: String # Can be error message too (?) error can be abstracted away
+    serviceRadius: Float! # Measured in KM
+    latitude: Float!
+    longitude: Float!
+    avgWaitMinute: Int! # For customer lines
+    avgLineCount : Int! # Measured in people
+    status: String! # online, maintenance, offline
+    subscriptionFee: Int!
+    expectedJerrycans: Int!
+    currentSubscribers: Int! #
+}
+
+# DynamoDB streams->Lambda to process data
+type CustomerTransactions @model @auth(rules:[{allow: groups, groups:["Admins"]}
+    {allow: groups, groups:["SiteManagers"]}
+    {allow: public, provider: iam }]) {
+    id: ID!
+    userPhoneNumber: String! @index(name: "byPhoneNumber", queryField: "customerTransactionByPhoneNumber")
+    fullName: String! # firstName+" "+lastName
+    siteName: String!
+    siteID: ID! @index(name: "bySite", queryField: "customerTransactionBySite")
+    action: String! # visit, subscription, unsubscription, reminder
+    status: String! # success, failure
+    collectedCount: Int! # Item count
+    collectedItemType: String! # Item type  KSH, jerrycans
+    ttl: Int! # time to live, just epoch time (seconds)
+}
+
+# If phone number is valid then you only need to submit userPhoneNumber and siteName
+type Query {
+    athenaCall(userPhoneNumber: String, siteName: String!, year: Int!, month: Int!, day: Int!, hour: Int!): String! @function(name: "TapGivesAthenaQuery-${env}")
+    broadcastMessage(siteID: String!, message: String!, allCustomers: String, customersBySite: String, allSiteManagers: String, siteManagersBySite: String): String @function(name: "BroadcastMessaging")
+}
+
