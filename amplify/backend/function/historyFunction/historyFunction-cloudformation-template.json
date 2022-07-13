@@ -59,12 +59,12 @@
         "FunctionName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "historyfunction",
+            "historyFunction",
             {
               "Fn::Join": [
                 "",
                 [
-                  "historyfunction",
+                  "historyFunction",
                   "-",
                   {
                     "Ref": "env"

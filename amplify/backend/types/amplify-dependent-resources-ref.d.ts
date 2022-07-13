@@ -38,7 +38,7 @@ export type AmplifyDependentResourcesAttributes = {
             "Region": "string",
             "LambdaExecutionRole": "string"
         },
-        "historyfunction": {
+        "historyFunction": {
             "Name": "string",
             "Arn": "string",
             "Region": "string",
